@@ -90,11 +90,12 @@
       <artifactId>jackson-annotations</artifactId>
       <version>2.21</version>
      </dependency>
-    <!-- <dependency>
+    <dependency>
       <groupId>io.github.oliviercailloux</groupId>
       <artifactId>jaris</artifactId>
       <version>0.0.42</version>
-    </dependency> -->
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
