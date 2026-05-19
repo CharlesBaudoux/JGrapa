@@ -65,6 +65,11 @@
       <artifactId>micronaut-json-schema-generator</artifactId>
     </dependency> -->
     <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <version>3.1.1</version>
+    </dependency>
+    <dependency>
       <groupId>io.micronaut.serde</groupId>
       <artifactId>micronaut-serde-api</artifactId>
       <version>2.15.0</version>
