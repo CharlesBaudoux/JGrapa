@@ -1,0 +1,26 @@
+{
+  "children": [
+    {
+      "label": "a",
+      "children": [
+        {
+          "label": "c",
+          "mark": 0.8
+        },
+        {
+          "label": "d",
+          "mark": 0.4
+        }
+      ]
+    },
+    {
+      "label": "b",
+      "children": [
+        {
+          "label": "e",
+          "mark": 0.9
+        }
+      ]
+    }
+  ]
+}
