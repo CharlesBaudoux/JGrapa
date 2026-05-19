@@ -1,0 +1,61 @@
+{
+  "$id": "https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/leafMark"
+    },
+    {
+      "$ref": "#/$defs/compositeMark"
+    }
+  ],
+  "$defs": {
+    "leafMark": {
+      "type": "object",
+      "required": [
+        "mark"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "mark": {
+          "type": "number"
+        }
+      }
+    },
+    "compositeMark": {
+      "type": "object",
+      "required": [
+        "children"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/child"
+          }
+        }
+      }
+    },
+    "child": {
+      "type": "object",
+      "required": [
+        "label"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string"
+        }
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/leafMark"
+        },
+        {
+          "$ref": "#/$defs/compositeMark"
+        }
+      ]
+    }
+  }
+}
