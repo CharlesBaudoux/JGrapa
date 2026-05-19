@@ -9,13 +9,24 @@
       "$ref": "#/$defs/compositeMark"
     }
   ],
+  "unevaluatedProperties": false,
   "$defs": {
+    "labeled": {
+      "type": "object",
+      "required": [
+        "label"
+      ],
+      "properties": {
+        "label": {
+          "type": "string"
+        }
+      }
+    },
     "leafMark": {
       "type": "object",
       "required": [
         "mark"
       ],
-      "additionalProperties": false,
       "properties": {
         "mark": {
           "type": "number"
@@ -27,33 +38,45 @@
       "required": [
         "children"
       ],
-      "additionalProperties": false,
       "properties": {
         "children": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/child"
+            "$ref": "#/$defs/labeledMark"
           }
         }
       }
     },
-    "child": {
-      "type": "object",
-      "required": [
-        "label"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "label": {
-          "type": "string"
-        }
-      },
-      "oneOf": [
+    "labeledLeafMark": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/labeled"
+        },
         {
           "$ref": "#/$defs/leafMark"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "labeledCompositeMark": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/labeled"
         },
         {
           "$ref": "#/$defs/compositeMark"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "labeledMark": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/labeledLeafMark"
+        },
+        {
+          "$ref": "#/$defs/labeledCompositeMark"
         }
       ]
     }
