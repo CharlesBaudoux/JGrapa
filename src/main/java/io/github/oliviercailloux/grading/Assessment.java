@@ -1,4 +1,4 @@
-package io.github.oliviercailloux.grading.beans;
+package io.github.oliviercailloux.grading;
 
 import com.google.common.base.Strings;
 import java.util.Objects;

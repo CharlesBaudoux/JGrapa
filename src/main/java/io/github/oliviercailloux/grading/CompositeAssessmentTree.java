@@ -1,4 +1,4 @@
-package io.github.oliviercailloux.grading.beans;
+package io.github.oliviercailloux.grading;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
