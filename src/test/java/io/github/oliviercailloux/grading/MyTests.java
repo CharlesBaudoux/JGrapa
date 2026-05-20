@@ -39,7 +39,7 @@ public class MyTests {
   void testGoodSchema() throws Exception {
     SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012());
     Schema draftSchema = schemaRegistry.getSchema(SchemaLocation.of(Dialects.getDraft202012().getId()));
-    String markTreeSchema = Resourcer.charSource("schemas/mark-tree.schema.json").read();
+    String markTreeSchema = Resourcer.charSource("schemas/assessment-tree.schema.json").read();
     assertEquals(ImmutableList.of(), draftSchema.validate(markTreeSchema, InputFormat.JSON));
   }
 
@@ -47,9 +47,9 @@ public class MyTests {
   void testMark() throws Exception {
     SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012(), builder -> builder
                 .schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers
-                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/mark-tree.schema.json")));
+                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/assessment-tree.schema.json")));
     Schema markTreeSchema = schemaRegistry
-        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json"));
+        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json"));
 
     List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Mark.json").read(), InputFormat.JSON);
     assertEquals(0, errors.size());
@@ -59,9 +59,9 @@ public class MyTests {
   void testWrongMark() throws Exception {
     SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012(), builder -> builder
                 .schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers
-                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/mark-tree.schema.json")));
+                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/assessment-tree.schema.json")));
     Schema markTreeSchema = schemaRegistry
-        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json"));
+        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json"));
 
     List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Wrong mark.json").read(), InputFormat.JSON);
     assertFalse(errors.isEmpty());
@@ -71,9 +71,9 @@ public class MyTests {
   void testComposite() throws Exception {
     SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012(), builder -> builder
                 .schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers
-                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/mark-tree.schema.json")));
+                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/assessment-tree.schema.json")));
     Schema markTreeSchema = schemaRegistry
-        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json"));
+        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json"));
 
     List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Composite.json").read(), InputFormat.JSON);
     assertEquals(0, errors.size());
@@ -83,9 +83,9 @@ public class MyTests {
   void testCompositeWithMarkLabel() throws Exception {
     SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012(), builder -> builder
                 .schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers
-                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/mark-tree.schema.json")));
+                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/assessment-tree.schema.json")));
     Schema markTreeSchema = schemaRegistry
-        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json"));
+        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json"));
 
     List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Composite with mark label.json").read(), InputFormat.JSON);
     assertEquals(0, errors.size());
@@ -95,9 +95,9 @@ public class MyTests {
   void testWrongComposite() throws Exception {
     SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012(), builder -> builder
                 .schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers
-                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/mark-tree.schema.json")));
+                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/assessment-tree.schema.json")));
     Schema markTreeSchema = schemaRegistry
-        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json"));
+        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json"));
 
     List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Wrong composite.json").read(), InputFormat.JSON);
     assertFalse(errors.isEmpty());

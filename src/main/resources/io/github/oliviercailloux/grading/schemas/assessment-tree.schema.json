@@ -1,19 +1,19 @@
 {
-  "$id": "https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json",
+  "$id": "https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$ref": "#/$defs/markTree",
+  "$ref": "#/$defs/assessmentTree",
   "$defs": {
-    "markTree": {
+    "assessmentTree": {
       "oneOf": [
         {
-          "$ref": "#/$defs/mark"
+          "$ref": "#/$defs/assessment"
         },
         {
           "$ref": "#/$defs/composite"
         }
       ]
     },
-    "mark": {
+    "assessment": {
       "type": "object",
       "required": [
         "mark"
@@ -21,6 +21,10 @@
       "properties": {
         "mark": {
           "type": "number"
+        },
+        "feedback": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "additionalProperties": false,
@@ -29,7 +33,7 @@
     "composite": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/$defs/markTree"
+        "$ref": "#/$defs/assessmentTree"
       },
       "minProperties": 1,
       "unevaluatedProperties": false
