@@ -32,7 +32,7 @@
                   <directory>../Grading schemas/</directory>
                 </resource>
               </resources>
-              <outputDirectory>schemas/</outputDirectory>
+              <outputDirectory>src/main/resources/io/github/oliviercailloux/grading/schemas/</outputDirectory>
             </configuration>
           </execution>
         </executions>
@@ -49,7 +49,7 @@
             </goals>
             <configuration>
               <enabled>true</enabled>
-              <inputDirectory>schemas/</inputDirectory>
+              <inputDirectory>src/main/resources/io/github/oliviercailloux/grading/schemas/</inputDirectory>
               <outputDirectory>.</outputDirectory>
               <outputPackageName>io.github.oliviercailloux.grading.beans</outputPackageName>
             </configuration>
