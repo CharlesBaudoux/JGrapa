@@ -1,0 +1,12 @@
+= JGrapa
+Java Grade PArser
+
+mark is currently a double but should really be a double or a label (e.g. "A", "B"), or perhaps could be a boolean (“pass” or “fail”).
+
+comment is a String but could be any object (for storing complex information). It is supposed to explain the student mark (such as why they failed).
+
+The ordering by criteria does not need reflect any aggregation purpose, it can be purely administrative, by date, …
+
+Then this is converted to a Scored mark object, where the mark is a double, and the sorting by criteria is used for aggregation purposes (so that the sub-trees group marks that are to be aggregated together), and joined with an Aggregator, a structure that says how to aggregate logically (but does not say how precisely to aggregate comments), for example says to weight-add the scores. Implementation is done by chosing a way to combine the comments (e.g. concatenate them with new lines).
+
+A pair of Scored mark and Aggregator is logically a single mark, together with the details about how it is produced. This is what should be stored for each student.
