@@ -3,10 +3,8 @@ package io.github.oliviercailloux.grading;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -54,8 +52,6 @@ public class AssessmentTreeJsonConverter {
         }
         yield node;
       }
-      default -> throw new IllegalStateException(
-          "Unhandled assessment tree implementation: " + tree.getClass());
     };
   }
 
@@ -64,24 +60,25 @@ public class AssessmentTreeJsonConverter {
     if (!(node instanceof ObjectNode objectNode)) {
       throw new IllegalArgumentException("Assessment tree node must be a JSON object.");
     }
-    Set<String> keys = new HashSet<>();
-    for (Map.Entry<String, JsonNode> property : objectNode.properties()) {
-      keys.add(property.getKey());
-    }
-    boolean onlyMarkOrFeedback =
-        keys.stream().allMatch(k -> k.equals("mark") || k.equals("feedback"));
-    if (onlyMarkOrFeedback) {
-      checkArgument(objectNode.has("mark"), "Assessment node must contain a mark property.");
+    boolean assessment = objectNode.has("mark") && objectNode.get("mark").isNumber();
+    if (assessment) {
+      objectNode.propertyNames().stream()
+          .filter(propertyName -> !propertyName.equals("mark") && !propertyName.equals("feedback"))
+          .findAny().ifPresent(invalidProperty -> {
+            throw new IllegalArgumentException("Assessment node must not contain property '"
+                + invalidProperty + "' besides mark and feedback.");
+          });
       JsonNode markNode = objectNode.get("mark");
-      checkArgument(markNode.isNumber(), "Assessment mark must be numeric.");
       double mark = markNode.asDouble();
-      String feedback = "";
+      String feedback;
       if (objectNode.has("feedback")) {
         JsonNode feedbackNode = objectNode.get("feedback");
         checkArgument(feedbackNode.isString(), "Assessment feedback must be a string.");
         feedback = feedbackNode.stringValue();
+      } else {
+        feedback = "";
       }
-      return Assessment.fromOptionalFeedback(mark, feedback);
+      return new Assessment(mark, feedback);
     }
     Map<Criterion, AssessmentTree> children = new LinkedHashMap<>();
     for (Map.Entry<String, JsonNode> property : objectNode.properties()) {
