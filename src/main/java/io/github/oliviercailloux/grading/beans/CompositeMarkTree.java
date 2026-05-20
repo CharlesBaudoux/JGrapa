@@ -6,7 +6,7 @@ import java.lang.Object;
 import java.util.List;
 
 @Serdeable
-public record CompositeMark(
+public record CompositeMarkTree(
     @NotNull List<Object> children
 ) {
 }

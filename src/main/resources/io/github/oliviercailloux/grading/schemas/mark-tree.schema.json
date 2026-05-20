@@ -3,10 +3,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "oneOf": [
     {
-      "$ref": "#/$defs/leafMark"
+      "$ref": "#/$defs/mark"
     },
     {
-      "$ref": "#/$defs/compositeMark"
+      "$ref": "#/$defs/compositeMarkTree"
     }
   ],
   "unevaluatedProperties": false,
@@ -22,7 +22,7 @@
         }
       }
     },
-    "leafMark": {
+    "mark": {
       "type": "object",
       "required": [
         "mark"
@@ -33,7 +33,7 @@
         }
       }
     },
-    "compositeMark": {
+    "compositeMarkTree": {
       "type": "object",
       "required": [
         "children"
@@ -42,41 +42,41 @@
         "children": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/labeledMark"
+            "$ref": "#/$defs/labeledMarkTree"
           }
         }
       }
     },
-    "labeledLeafMark": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/labeled"
-        },
-        {
-          "$ref": "#/$defs/leafMark"
-        }
-      ],
-      "unevaluatedProperties": false
-    },
-    "labeledCompositeMark": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/labeled"
-        },
-        {
-          "$ref": "#/$defs/compositeMark"
-        }
-      ],
-      "unevaluatedProperties": false
-    },
     "labeledMark": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/labeled"
+        },
+        {
+          "$ref": "#/$defs/mark"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "labeledCompositeMarkTree": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/labeled"
+        },
+        {
+          "$ref": "#/$defs/compositeMarkTree"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "labeledMarkTree": {
       "type": "object",
       "oneOf": [
         {
-          "$ref": "#/$defs/labeledLeafMark"
+          "$ref": "#/$defs/labeledMark"
         },
         {
-          "$ref": "#/$defs/labeledCompositeMark"
+          "$ref": "#/$defs/labeledCompositeMarkTree"
         }
       ]
     }

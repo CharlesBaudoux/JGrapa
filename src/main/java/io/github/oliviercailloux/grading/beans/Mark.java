@@ -4,7 +4,7 @@ import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotNull;
 
 @Serdeable
-public record LeafMark(
+public record Mark(
     @NotNull float mark
 ) {
 }
