@@ -12,13 +12,14 @@ import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.dialect.Dialects;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MyTests {
+public class SchemaTests {
   @SuppressWarnings("unused")
-  private static final Logger LOGGER = LoggerFactory.getLogger(MyTests.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SchemaTests.class);
 
   @Test
   void testWrongSchema() throws Exception {
