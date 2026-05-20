@@ -14,10 +14,10 @@ public class JsonTests {
     AssessmentTree tree = converter.fromJson(Resourcer.charSource("Composite with mark label.json").read());
 
     AssessmentTree expected = CompositeAssessmentTree.given(Map.of(Criterion.given("a"),
-        CompositeAssessmentTree.given(Map.of(Criterion.given("c"), Assessment.fromOptionalFeedback(0.8, null),
-            Criterion.given("mark"), Assessment.fromOptionalFeedback(0d, null))),
+        CompositeAssessmentTree.given(Map.of(Criterion.given("c"), Assessment.given(0.8),
+            Criterion.given("mark"), Assessment.given(0d))),
         Criterion.given("b"), CompositeAssessmentTree.given(Map.of(Criterion.given("e"),
-            Assessment.fromOptionalFeedback(0.9, null)))));
+            Assessment.given(0.9)))));
     assertEquals(expected, tree);
   }
 
@@ -28,7 +28,7 @@ public class JsonTests {
     AssessmentTree tree = converter.fromJson("{\"mark\": {\"mark\": 0}} ");
 
     AssessmentTree expected = CompositeAssessmentTree
-        .given(Map.of(Criterion.given("mark"), Assessment.fromOptionalFeedback(0d, null)));
+        .given(Map.of(Criterion.given("mark"), Assessment.given(0d)));
     assertEquals(expected, tree);
   }
   
