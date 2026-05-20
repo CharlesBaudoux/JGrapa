@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @SuppressWarnings("serial")
-public class Criterion implements Serializable{
+public class Criterion implements Serializable {
 
   public static Criterion given(String name) {
     return new Criterion(checkNotNull(name));
