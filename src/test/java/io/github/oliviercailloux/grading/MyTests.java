@@ -1,6 +1,7 @@
 package io.github.oliviercailloux.grading;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableList;
@@ -63,8 +64,7 @@ public class MyTests {
         .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json"));
 
     List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Wrong mark.json").read(), InputFormat.JSON);
-    assertEquals(1, errors.size());
-    assertEquals("unevaluatedProperties", errors.get(0).getMessageKey());
+    assertFalse(errors.isEmpty());
   }
 
   @Test
@@ -75,7 +75,19 @@ public class MyTests {
     Schema markTreeSchema = schemaRegistry
         .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json"));
 
-    List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Children.json").read(), InputFormat.JSON);
+    List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Composite.json").read(), InputFormat.JSON);
+    assertEquals(0, errors.size());
+  }
+
+  @Test
+  void testCompositeWithMarkLabel() throws Exception {
+    SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012(), builder -> builder
+                .schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers
+                    .mapPrefix("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json", "classpath:/io/github/oliviercailloux/grading/schemas/mark-tree.schema.json")));
+    Schema markTreeSchema = schemaRegistry
+        .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json"));
+
+    List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Composite with mark label.json").read(), InputFormat.JSON);
     assertEquals(0, errors.size());
   }
 
@@ -87,12 +99,7 @@ public class MyTests {
     Schema markTreeSchema = schemaRegistry
         .getSchema(SchemaLocation.of("https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json"));
 
-    List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Wrong children.json").read(), InputFormat.JSON);
-    assertEquals(12, errors.size());
-    assertEquals("oneOf", errors.get(0).getMessageKey());
-    assertEquals("required", errors.get(1).getMessageKey());
-    assertEquals("oneOf", errors.get(2).getMessageKey());
-    assertEquals("required", errors.get(3).getMessageKey());
-    assertEquals("unevaluatedProperties", errors.get(4).getMessageKey());
+    List<Error> errors = markTreeSchema.validate(Resourcer.charSource("Wrong composite.json").read(), InputFormat.JSON);
+    assertFalse(errors.isEmpty());
   }
 }

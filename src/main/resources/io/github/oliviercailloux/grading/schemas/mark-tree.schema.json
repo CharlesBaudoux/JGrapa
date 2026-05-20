@@ -1,26 +1,17 @@
 {
   "$id": "https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/mark-tree.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "oneOf": [
-    {
-      "$ref": "#/$defs/mark"
-    },
-    {
-      "$ref": "#/$defs/compositeMarkTree"
-    }
-  ],
-  "unevaluatedProperties": false,
+  "$ref": "#/$defs/markTree",
   "$defs": {
-    "labeled": {
-      "type": "object",
-      "required": [
-        "label"
-      ],
-      "properties": {
-        "label": {
-          "type": "string"
+    "markTree": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/mark"
+        },
+        {
+          "$ref": "#/$defs/composite"
         }
-      }
+      ]
     },
     "mark": {
       "type": "object",
@@ -31,54 +22,17 @@
         "mark": {
           "type": "number"
         }
-      }
-    },
-    "compositeMarkTree": {
-      "type": "object",
-      "required": [
-        "children"
-      ],
-      "properties": {
-        "children": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/labeledMarkTree"
-          }
-        }
-      }
-    },
-    "labeledMark": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/labeled"
-        },
-        {
-          "$ref": "#/$defs/mark"
-        }
-      ],
+      },
+      "additionalProperties": false,
       "unevaluatedProperties": false
     },
-    "labeledCompositeMarkTree": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/labeled"
-        },
-        {
-          "$ref": "#/$defs/compositeMarkTree"
-        }
-      ],
-      "unevaluatedProperties": false
-    },
-    "labeledMarkTree": {
+    "composite": {
       "type": "object",
-      "oneOf": [
-        {
-          "$ref": "#/$defs/labeledMark"
-        },
-        {
-          "$ref": "#/$defs/labeledCompositeMarkTree"
-        }
-      ]
+      "additionalProperties": {
+        "$ref": "#/$defs/markTree"
+      },
+      "minProperties": 1,
+      "unevaluatedProperties": false
     }
   }
 }
