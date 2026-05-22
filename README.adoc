@@ -60,7 +60,7 @@ ParametricWeighter: /**
 All marks are in [-1, 1]. Not sure negative ones always make sense (for some aggregators), but it is simpler for now.
 All weights are in [0, +∞[. Allowing negative weights for static weighter for example would permit “penalties”, but those make more sense as proportional reductions; I cannot see why negative weights would make sense otherwise.
 
-sealed abstract class BasicAggregator
+sealed abstract class Aggregator
   subs(Set<Crit>): Map<Crit, Aggregator> each taken fro subs or defaultSub if exists (otherwise the key set may be strict subset).
   abstract agg(Map<Crit, Double>): double
 
