@@ -10,3 +10,59 @@ The ordering by criteria does not need reflect any aggregation purpose, it can b
 Then this is converted to a Scored mark object, where the mark is a double, and the sorting by criteria is used for aggregation purposes (so that the sub-trees group marks that are to be aggregated together), and joined with an Aggregator, a structure that says how to aggregate logically (but does not say how precisely to aggregate comments), for example says to weight-add the scores. Implementation is done by chosing a way to combine the comments (e.g. concatenate them with new lines).
 
 A pair of Scored mark and Aggregator is logically a single mark, together with the details about how it is produced. This is what should be stored for each student.
+
+== Aggregator
+nothing else than indicated (unless otherwise specified)
+
+ParametricWeighter
+multiplied: String
+weighting: String
+subs[optional]: {
+  any[at least one]: aggregator
+}
+defaultSub[optional]: aggregator
+
+or
+StaticWeighter
+weights[optional]: {
+  any[at least one]: double
+}
+subs[optional]: {
+  any[at least one]: aggregator
+}
+defaultSub[optional]: aggregator
+
+or
+Owa
+weights: list of double, at least two different elements
+subs[optional]: {
+  any[at least one]: aggregator
+}
+defaultSub[optional]: aggregator
+
+StaticWeighter: if any criteria in assessment are missing in weights, then the missing criteria have a collective weight that is the complement to one of the sum, divided equally among them; if the sum is more than one, then the missing criteria have a collective weight of zero; if any criteria in weights are missing in assessment (in supplement to some in assessment missing in weights), it is an error.
+In any case, the weights are normalized to sum to one over the provided criteria.
+
+Owa: if more criteria in assessment than weights, the lower weight gets repeated au marc le franc among the repetitions of the lower weight; but keeping the total mass constant by dividing by the number of repetitions. Eg if 1, 2, 1, and six criteria, the weights become 1/5, 1/5, 1/5, 2, 1/5, 1/5.
+if fewer criteria in assessment than weights, then only the n biggest weights are used, keeping the first ones if the smallest of the kept ones is repeated.
+In any case, the weights are normalized to sum to one over the provided criteria.
+MAX is implemented by the weights [1, 0]
+MIN is implemented by the weights [0, 1]
+
+ParametricWeighter: /**
+ * Accepts only sets of two or three criteria that include the weighting and the multiplied one.
+ * Aggregates by multiplying the mark of the multiplied criterion by the mark of the weighting one,
+ * and, if a third criterion is present, summing with the mark of the third criterion multiplied by
+ * the complement of the mark of the weighting criterion (so <i>cW × c1 + (1 − cW) × c2</i>, where
+ * cW is the mark of the weighting criterion).
+ */
+
+All marks are in [-1, 1]. Not sure negative ones always make sense (for some aggregators), but it is simpler for now.
+All weights are in [0, +∞[. Allowing negative weights for static weighter for example would permit “penalties”, but those make more sense as proportional reductions; I cannot see why negative weights would make sense otherwise.
+
+sealed abstract class BasicAggregator
+  subs(Set<Crit>): Map<Crit, Aggregator> each taken fro subs or defaultSub if exists (otherwise the key set may be strict subset).
+  abstract agg(Map<Crit, Double>): double
+
+no TRIVIAL because they are not aggregators!
+aggregate as much as possible: keep some trees where cannot aggregate.

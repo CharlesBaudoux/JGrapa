@@ -1,0 +1,17 @@
+{
+  "multiplied": "x",
+  "weighting": "w",
+  "subs": {
+    "sub1": {
+      "weights": {
+        "a": 0.8
+      }
+    },
+    "sub2": {
+      "weights": [
+        0.2,
+        0.8
+      ]
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "$id": "https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/aggregator.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/aggregator",
+  "$defs": {
+    "aggregator": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/weighterAggregator"
+        },
+        {
+          "$ref": "#/$defs/owaAggregator"
+        },
+        {
+          "$ref": "#/$defs/parametricAggregator"
+        }
+      ]
+    },
+    "basicAggregator": {
+      "type": "object",
+      "properties": {
+        "subs": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/aggregator"
+          },
+          "minProperties": 1
+        },
+        "defaultSub": {
+          "$ref": "#/$defs/aggregator"
+        }
+      }
+    },
+    "weighterAggregator": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basicAggregator"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "weights": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              },
+              "minProperties": 1
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "owaAggregator": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basicAggregator"
+        },
+        {
+          "type": "object",
+          "required": [
+            "weights"
+          ],
+          "properties": {
+            "weights": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "parametricAggregator": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basicAggregator"
+        },
+        {
+          "type": "object",
+          "required": [
+            "multiplied",
+            "weighting"
+          ],
+          "properties": {
+            "multiplied": {
+              "type": "string",
+              "minLength": 1
+            },
+            "weighting": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}
