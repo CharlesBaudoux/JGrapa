@@ -43,15 +43,15 @@ public class SchemaTests {
     SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012());
     Schema draftSchema =
         schemaRegistry.getSchema(SchemaLocation.of(Dialects.getDraft202012().getId()));
-    String markTreeSchema = Resourcer.charSource("schemas/assessment-tree.schema.json").read();
-    assertEquals(ImmutableList.of(), draftSchema.validate(markTreeSchema, InputFormat.JSON));
+    String mySchema = Resourcer.charSource("schemas/assessment-tree.schema.json").read();
+    assertEquals(ImmutableList.of(), draftSchema.validate(mySchema, InputFormat.JSON));
   }
 
   @Test
   void testMark() throws Exception {
     Schema assessmentTreeSchema = AssessmentTreeJsonConverter.assessmentTreeSchema();
     List<Error> errors =
-        assessmentTreeSchema.validate(Resourcer.charSource("Mark.json").read(), InputFormat.JSON);
+        assessmentTreeSchema.validate(Resourcer.charSource("Assessment/Mark.json").read(), InputFormat.JSON);
     assertEquals(0, errors.size());
   }
 
@@ -59,7 +59,7 @@ public class SchemaTests {
   void testWrongMark() throws Exception {
     Schema assessmentTreeSchema = AssessmentTreeJsonConverter.assessmentTreeSchema();
     List<Error> errors = assessmentTreeSchema
-        .validate(Resourcer.charSource("Wrong mark.json").read(), InputFormat.JSON);
+        .validate(Resourcer.charSource("Assessment/Wrong mark.json").read(), InputFormat.JSON);
     assertFalse(errors.isEmpty());
   }
 
@@ -67,7 +67,7 @@ public class SchemaTests {
   void testComposite() throws Exception {
     Schema assessmentTreeSchema = AssessmentTreeJsonConverter.assessmentTreeSchema();
     List<Error> errors = assessmentTreeSchema
-        .validate(Resourcer.charSource("Composite.json").read(), InputFormat.JSON);
+        .validate(Resourcer.charSource("Assessment/Composite.json").read(), InputFormat.JSON);
     assertEquals(0, errors.size());
   }
 
@@ -75,7 +75,7 @@ public class SchemaTests {
   void testCompositeWithMarkLabel() throws Exception {
     Schema assessmentTreeSchema = AssessmentTreeJsonConverter.assessmentTreeSchema();
     List<Error> errors = assessmentTreeSchema
-        .validate(Resourcer.charSource("Composite with mark label.json").read(), InputFormat.JSON);
+        .validate(Resourcer.charSource("Assessment/Composite with mark label.json").read(), InputFormat.JSON);
     assertEquals(0, errors.size());
   }
 
@@ -83,7 +83,7 @@ public class SchemaTests {
   void testWrongComposite() throws Exception {
     Schema assessmentTreeSchema = AssessmentTreeJsonConverter.assessmentTreeSchema();
     List<Error> errors = assessmentTreeSchema
-        .validate(Resourcer.charSource("Wrong composite.json").read(), InputFormat.JSON);
+        .validate(Resourcer.charSource("Assessment/Wrong composite.json").read(), InputFormat.JSON);
     assertFalse(errors.isEmpty());
   }
 }
