@@ -1,6 +1,7 @@
 package io.github.oliviercailloux.grading.aggregator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.google.common.collect.ImmutableList;
 import com.networknt.schema.Error;
@@ -29,10 +30,18 @@ public class SchemaTests {
   }
 
   @Test
-  void testMark() throws Exception {
+  void testComplex() throws Exception {
     Schema aggregatorSchema = AggregatorJsonConverter.aggregatorSchema();
     List<Error> errors =
         aggregatorSchema.validate(Resourcer.charSource("Aggregator/Complex.json").read(), InputFormat.JSON);
     assertEquals(0, errors.size(), errors.toString());
+  }
+
+  @Test
+  void testWrong() throws Exception {
+    Schema aggregatorSchema = AggregatorJsonConverter.aggregatorSchema();
+    List<Error> errors =
+        aggregatorSchema.validate(Resourcer.charSource("Aggregator/Wrong.json").read(), InputFormat.JSON);
+    assertFalse(errors.isEmpty(), errors.toString());
   }
 }
