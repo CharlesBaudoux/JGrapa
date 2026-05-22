@@ -1,10 +1,11 @@
-package io.github.oliviercailloux.grading;
+package io.github.oliviercailloux.grading.assessment;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
+import io.github.oliviercailloux.grading.Criterion;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;

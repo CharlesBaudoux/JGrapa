@@ -1,4 +1,4 @@
-package io.github.oliviercailloux.grading;
+package io.github.oliviercailloux.grading.assessment;
 
 import com.google.common.base.Strings;
 import java.util.Objects;

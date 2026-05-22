@@ -1,4 +1,4 @@
-package io.github.oliviercailloux.grading;
+package io.github.oliviercailloux.grading.assessment;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -8,6 +8,7 @@ import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.dialect.Dialects;
+import io.github.oliviercailloux.grading.Criterion;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import tools.jackson.core.JacksonException;

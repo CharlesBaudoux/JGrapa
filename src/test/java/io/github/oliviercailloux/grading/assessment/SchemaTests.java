@@ -1,4 +1,4 @@
-package io.github.oliviercailloux.grading;
+package io.github.oliviercailloux.grading.assessment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,6 +11,8 @@ import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.dialect.Dialects;
+import io.github.oliviercailloux.grading.Resourcer;
+import io.github.oliviercailloux.grading.assessment.AssessmentTreeJsonConverter;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
