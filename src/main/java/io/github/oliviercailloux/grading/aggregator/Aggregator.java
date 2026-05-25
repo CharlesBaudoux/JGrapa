@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public sealed abstract class Aggregator
-    permits Parametric, Weighter, Owa {
+public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
 
   private final ImmutableMap<Criterion, Aggregator> subs;
   private final Optional<Aggregator> defaultSub;
@@ -32,5 +31,16 @@ public sealed abstract class Aggregator
     return subAggregators.build();
   }
 
+  /**
+   * @param marks non-empty
+   */
   public abstract double aggregate(Map<Criterion, Double> marks);
+
+  public ImmutableMap<Criterion, Aggregator> subs() {
+    return subs;
+  }
+
+  public Optional<Aggregator> defaultSub() {
+    return defaultSub;
+  }
 }
