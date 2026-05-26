@@ -1,0 +1,92 @@
+package io.github.oliviercailloux.grading.aggregator;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.google.common.collect.ImmutableMap;
+import io.github.oliviercailloux.grading.Criterion;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+
+public class ParametricTests {
+
+  @Test
+  void testAggregateWithWeightingAndMultipliedOnly() {
+    Parametric parametric = givenParametric();
+
+    double actual = parametric.aggregate(ImmutableMap.of(multiplied(), 0.8d, weighting(), 0.25d));
+
+    double weightedSum = 0.8d * 0.25d;
+    assertEquals(weightedSum, actual, 1e-12);
+  }
+
+  @Test
+  void testAggregateWithThirdCriterion() {
+    Parametric parametric = givenParametric();
+
+    double actual = parametric
+        .aggregate(ImmutableMap.of(multiplied(), 0.8d, weighting(), 0.25d, other(), 0.4d));
+
+    double weightedSum = 0.8d * 0.25d + 0.4d * (1d - 0.25d);
+    assertEquals(weightedSum, actual, 1e-12);
+  }
+
+  @Test
+  void testAggregateMissingMultipliedReturnsNaN() {
+    Parametric parametric = givenParametric();
+
+    double actual = parametric.aggregate(ImmutableMap.of(weighting(), 0.25d, other(), 0.4d));
+
+    assertTrue(Double.isNaN(actual));
+  }
+
+  @Test
+  void testAggregateMissingWeightingReturnsNaN() {
+    Parametric parametric = givenParametric();
+
+    double actual = parametric.aggregate(ImmutableMap.of(multiplied(), 0.8d, other(), 0.4d));
+
+    assertTrue(Double.isNaN(actual));
+  }
+
+  @Test
+  void testAggregateWithTooManyOtherCriteriaReturnsNaN() {
+    Parametric parametric = givenParametric();
+
+    double actual = parametric.aggregate(
+        ImmutableMap.of(multiplied(), 0.8d, weighting(), 0.25d, other(), 0.4d, c("d"), 0.3d));
+
+    assertTrue(Double.isNaN(actual));
+  }
+
+  @Test
+  void testAggregateWithNegativeMarks() {
+    Parametric parametric = givenParametric();
+
+    double actual = parametric
+        .aggregate(ImmutableMap.of(multiplied(), -0.8d, weighting(), 0.25d, other(), 0.4d));
+
+    double weightedSum = -0.8d * 0.25d + 0.4d * (1d - 0.25d);
+    assertEquals(weightedSum, actual, 1e-12);
+  }
+
+  private static Parametric givenParametric() {
+    return Parametric.of(multiplied(), weighting(), ImmutableMap.of(), Optional.empty());
+  }
+
+  private static Criterion multiplied() {
+    return c("multiplied");
+  }
+
+  private static Criterion weighting() {
+    return c("weighting");
+  }
+
+  private static Criterion other() {
+    return c("other");
+  }
+
+  private static Criterion c(String name) {
+    return Criterion.given(name);
+  }
+}
