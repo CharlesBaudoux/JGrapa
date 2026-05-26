@@ -25,7 +25,6 @@ public final class Weighter extends Aggregator {
       Optional<Aggregator> defaultSub) {
     super(subs, defaultSub);
     this.weights = ImmutableMap.copyOf(weights);
-    checkArgument(!weights.isEmpty(), "Weights must be non-empty.");
     weights.values().forEach(w -> checkArgument(w >= 0d, "Weights must be non-negative."));
   }
 

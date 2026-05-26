@@ -57,6 +57,15 @@ public class WeighterTests {
 		assertEquals(0.0d, actual, 1e-12);
 	}
 
+	@Test
+	void testAverage() {
+		Weighter weighter = givenWeighter(ImmutableMap.of());
+
+		double actual = weighter.aggregate(ImmutableMap.of(c("a"), 0.3d, c("b"), 0.9d));
+
+		assertEquals(0.6d, actual, 1e-12);
+	}
+
 	private static Weighter givenWeighter(Map<Criterion, Double> weights) {
 		return Weighter.of(weights, ImmutableMap.of(), Optional.empty());
 	}
