@@ -18,7 +18,7 @@ import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.node.ObjectNode;
 
 public class AssessmentTreeJsonConverter {
-  static Schema assessmentTreeSchema() {
+  public static Schema assessmentTreeSchema() {
     SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012(),
         builder -> builder.schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers.mapPrefix(
             "https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json",

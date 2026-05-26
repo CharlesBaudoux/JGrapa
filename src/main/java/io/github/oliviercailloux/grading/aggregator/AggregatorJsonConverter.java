@@ -18,7 +18,7 @@ import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.node.ObjectNode;
 
 public class AggregatorJsonConverter {
-  static Schema aggregatorSchema() {
+  public static Schema aggregatorSchema() {
     SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012(),
         builder -> builder.schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers.mapPrefix(
             "https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/aggregator.schema.json",
