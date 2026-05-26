@@ -61,22 +61,23 @@ public final class Owa extends Aggregator {
           nbToDuplicate - roundedNbToDuplicatePerOccurrence * nbOccurrenceOfRepeatedWeight;
       ImmutableList.Builder<Double> effectiveWeightsBuilder = ImmutableList.builder();
       for (Double weight : weights) {
-        final int nbToInsert;
+        final int nbToDuplicateThisInstance;
         if (weight.equals(repeatedWeight)) {
-          nbToInsert = roundedNbToDuplicatePerOccurrence + (remainder > 0 ? 1 : 0);
+          nbToDuplicateThisInstance = roundedNbToDuplicatePerOccurrence + (remainder > 0 ? 1 : 0);
           --remainder;
         } else {
-          nbToInsert = 1;
+          nbToDuplicateThisInstance = 0;
         }
-        for (int duplicateIndex = 0; duplicateIndex < nbToInsert; duplicateIndex++) {
-          effectiveWeightsBuilder.add(weight / nbToDuplicate);
+        final int nbToInsertThisInstance = nbToDuplicateThisInstance + 1;
+        for (int duplicateIndex = 0; duplicateIndex < nbToInsertThisInstance; duplicateIndex++) {
+          effectiveWeightsBuilder.add(weight / nbToInsertThisInstance);
         }
       }
       effectiveWeights = effectiveWeightsBuilder.build();
     } else {
       double smallestAcceptedWeight = weights.stream().sorted(Comparator.reverseOrder())
           .limit(marks.size()).min(Double::compareTo).orElseThrow(VerifyException::new);
-      effectiveWeights = weights.stream().sorted().filter(w -> smallestAcceptedWeight <= w)
+      effectiveWeights = weights.stream().filter(w -> smallestAcceptedWeight <= w)
           .limit(marks.size()).collect(ImmutableList.toImmutableList());
     }
     verify(effectiveWeights.size() == marks.size(),
