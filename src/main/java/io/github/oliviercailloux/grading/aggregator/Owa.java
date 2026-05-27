@@ -3,6 +3,7 @@ package io.github.oliviercailloux.grading.aggregator;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Verify.verify;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
@@ -15,13 +16,18 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public final class Owa extends Aggregator {
 
   private final ImmutableList<Double> weights;
 
-  public static Owa of(List<Double> weights, Map<Criterion, Aggregator> subs,
+  public static Owa given(List<Double> weights) {
+    return new Owa(weights, Map.of(), Optional.empty());
+  }
+  
+  public static Owa given(List<Double> weights, Map<Criterion, Aggregator> subs,
       Optional<Aggregator> defaultSub) {
     return new Owa(weights, subs, defaultSub);
   }
@@ -100,5 +106,35 @@ public final class Owa extends Aggregator {
 
   public ImmutableList<Double> weights() {
     return weights;
+  }
+
+  @Override
+  public Owa withSubs(Map<Criterion, Aggregator> newSubs) {
+    return new Owa(weights, newSubs, defaultSub());
+  }
+
+  @Override
+  public Owa withDefaultSub(Aggregator newDefaultSub) {
+    return new Owa(weights, subs(), Optional.of(newDefaultSub));
+  }
+
+  @Override
+  public boolean equals(Object o2) {
+    if (!(o2 instanceof Owa)) {
+      return false;
+    }
+    final Owa t2 = (Owa) o2;
+    return weights.equals(t2.weights)        && subs().equals(t2.subs())
+        && defaultSub().equals(t2.defaultSub());
+  }
+  
+  @Override
+  public int hashCode() {
+    return Objects.hash(weights, subs(), defaultSub());
+  }
+  
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this).add("weights", weights).add("subs", subs()).add("defaultSub", defaultSub()).toString();
   }
 }

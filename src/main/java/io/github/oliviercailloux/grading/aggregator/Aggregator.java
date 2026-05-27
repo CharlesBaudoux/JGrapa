@@ -43,4 +43,8 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
   public Optional<Aggregator> defaultSub() {
     return defaultSub;
   }
+
+  public abstract Aggregator withSubs(Map<Criterion, Aggregator> newSubs);
+
+  public abstract Aggregator withDefaultSub(Aggregator newDefaultSub);
 }

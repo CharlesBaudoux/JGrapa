@@ -71,7 +71,7 @@ public class ParametricTests {
   }
 
   private static Parametric givenParametric() {
-    return Parametric.of(multiplied(), weighting(), ImmutableMap.of(), Optional.empty());
+    return Parametric.given(multiplied(), weighting(), ImmutableMap.of(), Optional.empty());
   }
 
   private static Criterion multiplied() {

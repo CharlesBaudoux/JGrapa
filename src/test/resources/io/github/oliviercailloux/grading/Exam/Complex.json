@@ -1,0 +1,41 @@
+{
+  "assessments": {
+    "name 1": {
+      "a": {
+        "c": {
+          "mark": 0.8
+        },
+        "d": {
+          "mark": 0
+        }
+      },
+      "b": {
+        "e": {
+          "mark": 0.9,
+          "feedback": "Almost perfect."
+        }
+      }
+    },
+    "name 2": {
+      "mark": 0.5
+    }
+  },
+  "aggregator": {
+    "multiplied": "x",
+    "weighting": "w",
+    "subs": {
+      "sub1": {
+        "weights": {
+          "a": 0.8
+        }
+      },
+      "sub2": {
+        "weights": [
+          0.2,
+          0.8
+        ],
+        "defaultSub": {}
+      }
+    }
+  }
+}

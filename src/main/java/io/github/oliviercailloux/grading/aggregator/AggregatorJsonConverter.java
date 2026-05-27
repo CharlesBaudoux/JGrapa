@@ -132,7 +132,7 @@ public class AggregatorJsonConverter {
       JsonNode weightingNode = objectNode.get("weighting");
       verify(multipliedNode.isString(), "Property multiplied must be a string.");
       verify(weightingNode.isString(), "Property weighting must be a string.");
-      return Parametric.of(Criterion.given(multipliedNode.stringValue()),
+      return Parametric.given(Criterion.given(multipliedNode.stringValue()),
           Criterion.given(weightingNode.stringValue()), subs, defaultSub);
     }
 
@@ -145,14 +145,14 @@ public class AggregatorJsonConverter {
           weights.add(weightNode.doubleValue());
         }
         checkArgument(2 <= weights.stream().distinct().count(), "OWA weights must contain at least two different values.");
-        return Owa.of(weights, subs, defaultSub);
+        return Owa.given(weights, subs, defaultSub);
       }
 
       verify(weightsNode.isObject(), "Weighter weights must be an object.");
-      return Weighter.of(parseWeighterWeights(weightsNode), subs, defaultSub);
+      return Weighter.given(parseWeighterWeights(weightsNode), subs, defaultSub);
     }
 
-    return Weighter.of(ImmutableMap.of(), subs, defaultSub);
+    return Weighter.given(ImmutableMap.of(), subs, defaultSub);
   }
 
   private ImmutableMap<Criterion, Double> parseWeighterWeights(JsonNode weightsNode) {

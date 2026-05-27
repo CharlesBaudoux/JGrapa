@@ -3,13 +3,13 @@ package io.github.oliviercailloux.grading.aggregator;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.oliviercailloux.grading.Criterion;
-import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * A parametric aggregator that multiplies one criterion by a weighting criterion and optionally
@@ -20,7 +20,11 @@ public final class Parametric extends Aggregator {
   private final Criterion multiplied;
   private final Criterion weighting;
 
-  public static Parametric of(Criterion multiplied, Criterion weighting,
+  public static Parametric given(Criterion multiplied, Criterion weighting) {
+    return new Parametric(multiplied, weighting, Map.of(), Optional.empty());
+  }
+  
+  public static Parametric given(Criterion multiplied, Criterion weighting,
       Map<Criterion, Aggregator> subs, Optional<Aggregator> defaultSub) {
     return new Parametric(multiplied, weighting, subs, defaultSub);
   }
@@ -63,4 +67,34 @@ public final class Parametric extends Aggregator {
     return weighting;
   }
 
+  @Override
+  public Parametric withSubs(Map<Criterion, Aggregator> newSubs) {
+    return new Parametric(multiplied, weighting, newSubs, defaultSub());
+  }
+
+  @Override
+  public Parametric withDefaultSub(Aggregator newDefaultSub) {
+    return new Parametric(multiplied, weighting, subs(), Optional.of(newDefaultSub));
+  }
+
+  @Override
+  public boolean equals(Object o2) {
+    if (!(o2 instanceof Parametric)) {
+      return false;
+    }
+    final Parametric t2 = (Parametric) o2;
+    return multiplied.equals(t2.multiplied) && weighting.equals(t2.weighting)
+        && subs().equals(t2.subs()) && defaultSub().equals(t2.defaultSub());
+  }
+  
+  @Override
+  public int hashCode() {
+    return Objects.hash(multiplied, weighting, subs(), defaultSub());
+  }
+  
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this).add("multiplied", multiplied).add("weighting", weighting)
+        .add("subs", subs()).add("defaultSub", defaultSub()).toString();
+  }
 }
