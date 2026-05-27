@@ -41,11 +41,19 @@ public class WeighterTests {
 	}
 
 	@Test
-	void testAggregateRejectsMixedDisagreementOnCriteria() {
-		Weighter weighter = givenWeighter(ImmutableMap.of(c("a"), 1.0d, c("b"), 1.0d));
+	void testAggregateMixedCriteria() {
+		Weighter weighter = givenWeighter(ImmutableMap.of(c("a"), 4d, c("b"), 1d));
 
-		assertThrows(IllegalArgumentException.class,
-				() -> weighter.aggregate(ImmutableMap.of(c("a"), 0.2d, c("c"), 0.8d)));
+		double actual = weighter.aggregate(ImmutableMap.of(c("a"), 0.2d, c("c"), 0.8d));
+		assertEquals(0.2d, actual, 1e-12);
+	}
+
+	@Test
+	void testAggregateMixedCriteriaComplement() {
+		Weighter weighter = givenWeighter(ImmutableMap.of(c("a"), 0.4d, c("b"), 1d));
+
+		double actual = weighter.aggregate(ImmutableMap.of(c("a"), 0.2d, c("c"), 0.8d));
+		assertEquals(0.56d, actual, 1e-12);
 	}
 
 	@Test

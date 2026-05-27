@@ -40,7 +40,7 @@ subs[optional]: {
 }
 defaultSub[optional]: aggregator
 
-StaticWeighter: if any criteria in assessment are missing in weights, then the missing criteria have a collective weight that is the complement to one of the sum, divided equally among them; if the sum is more than one, then the missing criteria have a collective weight of zero; if any criteria in weights are missing in assessment (in supplement to some in assessment missing in weights), it is an error.
+StaticWeighter: if any criteria in assessment are missing in weights, then the missing criteria have a collective weight that is the complement to one of the sum of the weights of the provided criteria (or zero if that sum is at least one), divided equally among them.
 In any case, the weights are normalized to sum to one over the provided criteria.
 
 Owa: if more criteria in assessment than weights, the lower weight gets repeated, round-robin fashion, among the repetitions of the lower weight; but keeping the total mass constant by dividing by the number of repetitions. Eg if 1, 3, 1, and six criteria, the weights become 1/3, 1/3, 1/3, 3, 1/2, 1/2.

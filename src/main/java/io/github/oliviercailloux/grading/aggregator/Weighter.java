@@ -19,7 +19,7 @@ public final class Weighter extends Aggregator {
   public static Weighter given(Map<Criterion, Double> weights) {
     return new Weighter(weights, Map.of(), Optional.empty());
   }
-  
+
   public static Weighter given(Map<Criterion, Double> weights, Map<Criterion, Aggregator> subs,
       Optional<Aggregator> defaultSub) {
     return new Weighter(weights, subs, defaultSub);
@@ -39,11 +39,6 @@ public final class Weighter extends Aggregator {
 
     ImmutableSet<Criterion> missingInWeights =
         Sets.difference(marks.keySet(), weights.keySet()).immutableCopy();
-    ImmutableSet<Criterion> missingInMarks =
-        Sets.difference(weights.keySet(), marks.keySet()).immutableCopy();
-    checkArgument(missingInWeights.isEmpty() || missingInMarks.isEmpty(),
-        "Weights and marks disagree on criteria: weights=%s, marks=%s.", weights.keySet(),
-        marks.keySet());
 
     double explicitWeightSum = 0d;
     for (Map.Entry<Criterion, Double> entry : weights.entrySet()) {
@@ -53,14 +48,14 @@ public final class Weighter extends Aggregator {
     }
 
     double missingShare = 0d;
+    double complement = Math.max(0d, 1d - explicitWeightSum);
     if (!missingInWeights.isEmpty()) {
-      missingShare = Math.max(0d, 1d - explicitWeightSum) / missingInWeights.size();
+      missingShare = complement / missingInWeights.size();
     }
 
-    double totalWeight = 0d;
-    for (Criterion criterion : marks.keySet()) {
-      totalWeight += weights.getOrDefault(criterion, missingShare);
-    }
+    final double totalWeight =
+        Sets.intersection(marks.keySet(), weights.keySet()).stream().mapToDouble(weights::get).sum()
+            + complement;
     if (totalWeight == 0d) {
       return 0d;
     }
@@ -93,16 +88,18 @@ public final class Weighter extends Aggregator {
       return false;
     }
     final Weighter t2 = (Weighter) o2;
-    return weights.equals(t2.weights) && subs().equals(t2.subs()) && defaultSub().equals(t2.defaultSub());
+    return weights.equals(t2.weights) && subs().equals(t2.subs())
+        && defaultSub().equals(t2.defaultSub());
   }
-  
+
   @Override
   public int hashCode() {
     return Objects.hash(weights, subs(), defaultSub());
   }
-  
+
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this).add("weights", weights).add("subs", subs()).add("defaultSub", defaultSub()).toString();
+    return MoreObjects.toStringHelper(this).add("weights", weights).add("subs", subs())
+        .add("defaultSub", defaultSub()).toString();
   }
 }
