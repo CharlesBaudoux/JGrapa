@@ -4,6 +4,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
+import com.google.common.base.VerifyException;
+import com.google.common.math.DoubleMath;
+import com.google.common.primitives.Ints;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaRegistry;
@@ -28,12 +31,17 @@ public class AssessmentTreeJsonConverter {
     return assessmentTreeSchema;
   }
 
-  public static AssessmentTreeJsonConverter using(ObjectMapper mapper, Schema assessmentTreeSchema) {
-    return new AssessmentTreeJsonConverter(mapper, assessmentTreeSchema);
-  }
-
   public static AssessmentTreeJsonConverter usingDefault() {
     return new AssessmentTreeJsonConverter(new ObjectMapper(), assessmentTreeSchema());
+  }
+
+  public static AssessmentTreeJsonConverter using(ObjectMapper mapper) {
+    return new AssessmentTreeJsonConverter(mapper, assessmentTreeSchema());
+  }
+
+  public static AssessmentTreeJsonConverter using(ObjectMapper mapper,
+      Schema assessmentTreeSchema) {
+    return new AssessmentTreeJsonConverter(mapper, assessmentTreeSchema);
   }
 
   private final ObjectMapper mapper;
@@ -44,25 +52,41 @@ public class AssessmentTreeJsonConverter {
     this.assessmentTreeSchema = checkNotNull(assessmentTreeSchema);
   }
 
-  public String toJson(AssessmentTree tree) throws JacksonException {
-    ObjectNode node = toJsonNode(tree);
-    verify(assessmentTreeSchema.validate(node).isEmpty(),
-        "Generated JSON does not conform to schema.");
+  public String toJsonString(AssessmentTree tree) throws JacksonException {
+    ObjectNode node = toJson(tree);
     return mapper.writer(SerializationFeature.INDENT_OUTPUT).writeValueAsString(node);
   }
 
   public AssessmentTree fromJson(String json) throws JacksonException {
     JsonNode node = mapper.readTree(checkNotNull(json));
-    checkArgument(assessmentTreeSchema.validate(node).isEmpty(),
-        "Provided JSON does not conform to schema.");
-    return fromJsonNode(node);
+    if (!(node instanceof ObjectNode objectNode)) {
+      throw new IllegalArgumentException("Assessment tree node must be a JSON object.");
+    }
+    return fromJson(objectNode);
   }
 
-  private ObjectNode toJsonNode(AssessmentTree tree) {
+  public ObjectNode toJson(AssessmentTree tree) {
+    ObjectNode main = toJsonInternal(tree);
+    verify(assessmentTreeSchema.validate(main).isEmpty(),
+        "Generated JSON does not conform to schema.");
+    return main;
+  }
+
+  private ObjectNode toJsonInternal(AssessmentTree tree) {
     return switch (tree) {
       case Assessment assessment -> {
         ObjectNode node = mapper.createObjectNode();
-        node.put("mark", assessment.mark());
+        double mark = assessment.mark();
+        if (DoubleMath.isMathematicalInteger(mark)) {
+          long integralMark = (long) mark;
+          if (Integer.MIN_VALUE <= mark && mark <= Integer.MAX_VALUE) {
+            node.put("mark", Ints.checkedCast(integralMark));
+          } else {
+            node.put("mark", integralMark);
+          }
+        } else {
+          node.put("mark", mark);
+        }
         if (!assessment.feedback().isEmpty()) {
           node.put("feedback", assessment.feedback());
         }
@@ -71,31 +95,33 @@ public class AssessmentTreeJsonConverter {
       case CompositeAssessmentTree composite -> {
         ObjectNode node = mapper.createObjectNode();
         for (Map.Entry<Criterion, AssessmentTree> entry : composite.getChildren().entrySet()) {
-          node.set(entry.getKey().getName(), toJsonNode(entry.getValue()));
+          node.set(entry.getKey().getName(), toJsonInternal(entry.getValue()));
         }
         yield node;
       }
     };
   }
 
-  private AssessmentTree fromJsonNode(JsonNode node) {
-    checkNotNull(node);
-    if (!(node instanceof ObjectNode objectNode)) {
-      throw new IllegalArgumentException("Assessment tree node must be a JSON object.");
-    }
-    boolean assessment = objectNode.has("mark") && objectNode.get("mark").isNumber();
+  public AssessmentTree fromJson(ObjectNode node) {
+    checkArgument(assessmentTreeSchema.validate(node).isEmpty(),
+        "Provided JSON does not conform to schema.");
+    return fromJsonInternal(node);
+  }
+
+  private AssessmentTree fromJsonInternal(ObjectNode node) {
+    boolean assessment = node.has("mark") && node.get("mark").isNumber();
     if (assessment) {
-      objectNode.propertyNames().stream()
+      node.propertyNames().stream()
           .filter(propertyName -> !propertyName.equals("mark") && !propertyName.equals("feedback"))
           .findAny().ifPresent(invalidProperty -> {
             throw new IllegalArgumentException("Assessment node must not contain property '"
                 + invalidProperty + "' besides mark and feedback.");
           });
-      JsonNode markNode = objectNode.get("mark");
+      JsonNode markNode = node.get("mark");
       double mark = markNode.asDouble();
       String feedback;
-      if (objectNode.has("feedback")) {
-        JsonNode feedbackNode = objectNode.get("feedback");
+      if (node.has("feedback")) {
+        JsonNode feedbackNode = node.get("feedback");
         checkArgument(feedbackNode.isString(), "Assessment feedback must be a string.");
         feedback = feedbackNode.stringValue();
       } else {
@@ -104,9 +130,14 @@ public class AssessmentTreeJsonConverter {
       return new Assessment(mark, feedback);
     }
     Map<Criterion, AssessmentTree> children = new LinkedHashMap<>();
-    for (Map.Entry<String, JsonNode> property : objectNode.properties()) {
+    for (Map.Entry<String, JsonNode> property : node.properties()) {
       Criterion criterion = Criterion.given(property.getKey());
-      AssessmentTree child = fromJsonNode(property.getValue());
+      JsonNode value = property.getValue();
+      if (!(value instanceof ObjectNode objectValue)) {
+        throw new VerifyException(
+            "Assessment tree node in conforming node should be a JSON object.");
+      }
+      AssessmentTree child = fromJsonInternal(objectValue);
       children.put(criterion, child);
     }
     return CompositeAssessmentTree.given(children);

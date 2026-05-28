@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import io.github.oliviercailloux.grading.Criterion;
 import io.github.oliviercailloux.grading.Resourcer;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 public class JsonTests {
 
@@ -52,7 +53,8 @@ public class JsonTests {
 
   @Test
   void testSerializeCompositeWithOnlyMarkChild() throws Exception {
-    AssessmentTreeJsonConverter converter = AssessmentTreeJsonConverter.usingDefault();
+    ObjectMapper mapper = new ObjectMapper();
+    AssessmentTreeJsonConverter converter = AssessmentTreeJsonConverter.using(mapper);
 
     AssessmentTree tree =
         CompositeAssessmentTree.given(ImmutableMap.of(Criterion.given("mark"), Assessment.given(0d)));
@@ -60,15 +62,16 @@ public class JsonTests {
     String expected = """
     {
       "mark" : {
-        "mark" : 0.0
+        "mark" : 0
       }
     }""";
-    assertEquals(expected, converter.toJson(tree));
+    assertEquals(mapper.readTree(expected), converter.toJson(tree));
   }
 
   @Test
   void testSerializeComposite() throws Exception {
-    AssessmentTreeJsonConverter converter = AssessmentTreeJsonConverter.usingDefault();
+    ObjectMapper mapper = new ObjectMapper();
+    AssessmentTreeJsonConverter converter = AssessmentTreeJsonConverter.using(mapper);
 
     AssessmentTree tree =
     CompositeAssessmentTree.given(ImmutableMap.of(Criterion.given("a"),
@@ -78,6 +81,6 @@ public class JsonTests {
             .given(ImmutableMap.of(Criterion.given("e"), Assessment.given(0.9, "Almost perfect.")))));
 
     String expected = Resourcer.charSource("Assessment/Composite.json").read();
-    assertEquals(expected, converter.toJson(tree).replaceAll(" :", ":").replaceAll("(?m)0\\.0$", "0") + "\n");
+    assertEquals(mapper.readTree(expected), converter.toJson(tree));
   }
 }
