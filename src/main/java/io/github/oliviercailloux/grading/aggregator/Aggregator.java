@@ -14,64 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
-  public static class WeightedMarks {
-    private static final double TOLERANCE = 1e-9;
-    private final ImmutableMap<Criterion, Mark> marks;
-    private final ImmutableMap<Criterion, Double> weights;
-
-    private WeightedMarks(Map<Criterion, Mark> marks, Map<Criterion, Double> weights) {
-      checkArgument(weights.values().stream().allMatch(w -> Double.isFinite(w)),
-      "All weights must be finite.");
-      checkArgument(weights.values().stream().allMatch(w -> 0d <= w),
-      "All weights must be non-negative.");
-      double totalWeight = weights.values().stream().mapToDouble(Double::doubleValue).sum();
-      checkArgument(DoubleMath.fuzzyEquals(totalWeight, 1d, TOLERANCE), "Total weight must be one.");
-      checkArgument(marks.keySet().equals(weights.keySet()), "Marks and weights must have the same criteria.");
-      this.marks = ImmutableMap.copyOf(marks);
-      this.weights = ImmutableMap.copyOf(weights);
-    }
-
-    /**
-     * @return not empty
-     */
-    public ImmutableMap<Criterion, Mark> marks() {
-      return marks;
-    }
-    
-    /**
-     * @return sum to one, non-negative, no NaN
-     */
-    public ImmutableMap<Criterion, Double> weights() {
-      return weights;
-    }
-
-    public ImmutableSet<Criterion> criteria() {
-      return marks.keySet();
-    }
-    
-    public Mark mark(Criterion criterion) {
-      if(!marks.containsKey(criterion)) {
-        throw new NoSuchElementException("Criterion not found: " + criterion);
-      }
-      return marks.get(criterion);
-    }
-
-    public double weight(Criterion criterion) {
-      if(!weights.containsKey(criterion)) {
-        throw new NoSuchElementException("Criterion not found: " + criterion);
-      }
-      return weights.get(criterion);
-    }
-
-    public double weightedAverage() {
-      double result = 0d;
-      for (Criterion criterion : criteria()) {
-        result += mark(criterion).value() * weight(criterion);
-      }
-      return result;
-    }
-  }
-
   public static record OneLevelMarksTree (/**
                                            * non-empty
                                            */
@@ -104,6 +46,67 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
       }
     }
     return subAggregators.build();
+  }
+
+  public static class WeightedMarks {
+    public static WeightedMarks given(OneLevelMarksTree marks, Map<Criterion, Double> weights) {
+      return new WeightedMarks(marks, weights);
+    }
+    private static final double TOLERANCE = 1e-9;
+    private final OneLevelMarksTree marks;
+    private final ImmutableMap<Criterion, Double> weights;
+
+    private WeightedMarks(OneLevelMarksTree marks, Map<Criterion, Double> weights) {
+      checkArgument(weights.values().stream().allMatch(w -> Double.isFinite(w)),
+      "All weights must be finite.");
+      checkArgument(weights.values().stream().allMatch(w -> 0d <= w),
+      "All weights must be non-negative.");
+      double totalWeight = weights.values().stream().mapToDouble(Double::doubleValue).sum();
+      checkArgument(DoubleMath.fuzzyEquals(totalWeight, 1d, TOLERANCE), "Total weight must be one.");
+      checkArgument(marks.map().keySet().equals(weights.keySet()), "Marks and weights must have the same criteria.");
+      this.marks = checkNotNull(marks);
+      this.weights = ImmutableMap.copyOf(weights);
+    }
+
+    /**
+     * @return not empty
+     */
+    public OneLevelMarksTree marks() {
+      return marks;
+    }
+    
+    /**
+     * @return sum to one, non-negative, no NaN
+     */
+    public ImmutableMap<Criterion, Double> weights() {
+      return weights;
+    }
+
+    public ImmutableSet<Criterion> criteria() {
+      return marks.map().keySet();
+    }
+    
+    public Mark mark(Criterion criterion) {
+      if(!marks.map().containsKey(criterion)) {
+        throw new NoSuchElementException("Criterion not found: " + criterion);
+      }
+      return marks.map().get(criterion);
+    }
+
+    public double weight(Criterion criterion) {
+      if(!weights.containsKey(criterion)) {
+        throw new NoSuchElementException("Criterion not found: " + criterion);
+      }
+      return weights.get(criterion);
+    }
+
+    public double weightedAverage() {
+      double result = 0d;
+      for (Criterion criterion : criteria()) {
+        result += mark(criterion).value() * weight(criterion);
+      }
+      return result;
+    }
   }
 
   public abstract double aggregate(OneLevelMarksTree marks);
