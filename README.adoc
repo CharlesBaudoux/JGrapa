@@ -66,5 +66,3 @@ sealed abstract class Aggregator
 no TRIVIAL because they are not aggregators!
 aggregate as much as possible: keep some trees where cannot aggregate.
 
-TODO check Aggregator hierarchy, created by AI.
-
