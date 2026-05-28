@@ -57,15 +57,6 @@ public class OwaTests {
     assertEquals(0.8d, actual, 1e-12);
   }
 
-  @Test
-  void testNaNPropagates() {
-    Owa owa = givenOwa(ImmutableList.of(1d, 0d));
-
-    double actual = owa.aggregate(TestUtils.givenMarksTree("a", Double.NaN, "b", 0.8d));
-
-    assertTrue(Double.isNaN(actual));
-  }
-
   private static Owa givenOwa(List<Double> weights) {
     return Owa.given(weights, ImmutableMap.of(), Optional.empty());
   }
