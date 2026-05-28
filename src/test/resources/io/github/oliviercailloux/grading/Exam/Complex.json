@@ -1,4 +1,19 @@
 {
+  "weights": {
+    "a": 0.7
+  },
+  "subs": {
+    "a": {
+      "weights": [
+        1,
+        0
+      ]
+    }
+  },
+  "defaultSub": {
+    "multiplied": "e",
+    "weighting": "w"
+  },
   "assessments": {
     "name 1": {
       "a": {
@@ -18,24 +33,6 @@
     },
     "name 2": {
       "mark": 0.5
-    }
-  },
-  "aggregator": {
-    "multiplied": "x",
-    "weighting": "w",
-    "subs": {
-      "sub1": {
-        "weights": {
-          "a": 0.8
-        }
-      },
-      "sub2": {
-        "weights": [
-          0.2,
-          0.8
-        ],
-        "defaultSub": {}
-      }
     }
   }
 }

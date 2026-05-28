@@ -1,0 +1,24 @@
+{
+  "$id": "https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/exam.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/exam",
+  "$defs": {
+    "exam": {
+      "type": "object",
+      "required": [
+        "aggregator"
+      ],
+      "$ref": "https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/aggregator.schema.json",
+      "properties": {
+        "assessments": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "https://raw.githubusercontent.com/oliviercailloux/grading-schema/main/assessment-tree.schema.json"
+          },
+          "minProperties": 1
+        }
+      },
+      "unevaluatedProperties": false
+    }
+  }
+}
