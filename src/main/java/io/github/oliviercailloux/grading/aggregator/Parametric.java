@@ -15,7 +15,7 @@ import java.util.Optional;
 
 /**
  * A parametric aggregator that multiplies one criterion by a weighting criterion and optionally
- * blends a third criterion with the complement of the weighting criterion.
+ * blends other criteria with the complement of the weighting criterion.
  */
 public final class Parametric extends Aggregator {
 
