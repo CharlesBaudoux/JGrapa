@@ -50,10 +50,9 @@ MAX is implemented by the weights [1, 0]
 MIN is implemented by the weights [0, 1]
 
 ParametricWeighter: /**
- * Accepts only sets of two or three criteria that include the weighting and the multiplied one.
- * Aggregates by multiplying the mark of the multiplied criterion by the mark of the weighting one,
- * and, if a third criterion is present, summing with the mark of the third criterion multiplied by
- * the complement of the mark of the weighting criterion (so <i>cW × c1 + (1 − cW) × c2</i>, where
+ * Aggregates by multiplying the mark of the multiplied criterion (defaulting to 1) by the mark of the weighting one (defaulting to 1),
+ * and, if more criteria are present, summing with the mark of the other criteria multiplied by
+ * the complement of the mark of the weighting criterion, spread equally (so <i>cW × cM + (1 − cW) × avg(c3)</i>, where
  * cW is the mark of the weighting criterion).
  */
 

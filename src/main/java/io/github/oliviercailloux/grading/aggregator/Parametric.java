@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.oliviercailloux.grading.Criterion;
@@ -44,18 +45,14 @@ public final class Parametric extends Aggregator {
     ImmutableSet<Criterion> otherCriteria = marks.keySet().stream()
         .filter(criterion -> !criterion.equals(multiplied) && !criterion.equals(weighting))
         .collect(ImmutableSet.toImmutableSet());
-        if(2 <= otherCriteria.size()) {
-          return Double.NaN;
-        }
-    double multipliedMark = marks.getOrDefault(multiplied, Double.NaN);
-    double weightingMark = marks.getOrDefault(weighting, Double.NaN);
-    final double complementWeightingMark;
-    if(otherCriteria.isEmpty()) {
-      complementWeightingMark = 0d;
-    } else {
-      complementWeightingMark = marks.get(Iterables.getOnlyElement(otherCriteria)) * (1d - weightingMark);
-    }
-    double result = multipliedMark * weightingMark + complementWeightingMark;
+    double weightingMark = marks.getOrDefault(weighting, 1d);
+    ImmutableMap.Builder<Criterion, Double> weightsBuilder = ImmutableMap.builder();
+    weightsBuilder.put(multiplied, weightingMark);
+    otherCriteria.forEach(criterion -> weightsBuilder.put(criterion, (1d - weightingMark) / otherCriteria.size()));
+    ImmutableMap<Criterion, Double> effectiveWeights = weightsBuilder.build();
+    double result = effectiveWeights.keySet().stream()
+        .mapToDouble(criterion -> marks.getOrDefault(criterion, 1d) * effectiveWeights.get(criterion))
+        .sum();
     return result;
   }
 
