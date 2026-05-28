@@ -76,7 +76,7 @@ public class AssessmentTreeJsonConverter {
     return switch (tree) {
       case Assessment assessment -> {
         ObjectNode node = mapper.createObjectNode();
-        double mark = assessment.mark();
+        double mark = assessment.mark().value();
         if (DoubleMath.isMathematicalInteger(mark)) {
           long integralMark = (long) mark;
           if (Integer.MIN_VALUE <= mark && mark <= Integer.MAX_VALUE) {
@@ -119,15 +119,17 @@ public class AssessmentTreeJsonConverter {
           });
       JsonNode markNode = node.get("mark");
       double mark = markNode.asDouble();
+      checkArgument(-1d <= mark, "Assessment mark must be at least -1.");
+      checkArgument(mark <= 1d, "Assessment mark must be at most 1.");
       String feedback;
       if (node.has("feedback")) {
         JsonNode feedbackNode = node.get("feedback");
-        checkArgument(feedbackNode.isString(), "Assessment feedback must be a string.");
+        verify(feedbackNode.isString(), "Assessment feedback must be a string.");
         feedback = feedbackNode.stringValue();
       } else {
         feedback = "";
       }
-      return new Assessment(mark, feedback);
+      return new Assessment(new Mark(mark), feedback);
     }
     Map<Criterion, AssessmentTree> children = new LinkedHashMap<>();
     for (Map.Entry<String, JsonNode> property : node.properties()) {
