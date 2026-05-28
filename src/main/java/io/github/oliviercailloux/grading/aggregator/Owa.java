@@ -6,10 +6,15 @@ import static com.google.common.base.Verify.verify;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Streams;
 import com.google.common.math.DoubleMath;
+import com.google.common.math.IntMath;
 import io.github.oliviercailloux.grading.Criterion;
 import io.github.oliviercailloux.grading.assessment.Mark;
 import java.math.RoundingMode;
@@ -27,7 +32,7 @@ public final class Owa extends Aggregator {
   public static Owa given(List<Double> weights) {
     return new Owa(weights, Map.of(), Optional.empty());
   }
-  
+
   public static Owa given(List<Double> weights, Map<Criterion, Aggregator> subs,
       Optional<Aggregator> defaultSub) {
     return new Owa(weights, subs, defaultSub);
@@ -44,24 +49,33 @@ public final class Owa extends Aggregator {
     }
   }
 
-  @Override
-  public double aggregate(OneLevelMarksTree marks) {
-    return aggregate(ImmutableMultiset.copyOf(marks.map().values()));
-  }
-
   /**
    * @param marks non-empty
    */
   public double aggregate(Multiset<Mark> marks) {
     checkArgument(!marks.isEmpty(), "Marks must be non-empty.");
+    ImmutableMap.Builder<Criterion, Mark> marksBuilder = ImmutableMap.builder();
+    int index = 1;
+    int nbDigits = IntMath.log10(marks.size(), RoundingMode.DOWN) + 1;
+    String format = "Mark %0" + nbDigits + "d";
+    for (Mark mark : marks) {
+      String markNb = format.formatted(index);
+      marksBuilder.put(Criterion.given(markNb), mark);
+      ++index;
+    }
+    return aggregate(OneLevelMarksTree.given(marksBuilder.build()));
+  }
 
+  @Override
+  public double aggregate(OneLevelMarksTree marks) {
+    int nbMarks = marks.map().size();
     final ImmutableList<Double> effectiveWeights;
-    if (weights.size() <= marks.size()) {
+    if (weights.size() <= nbMarks) {
       double repeatedWeight =
           weights.stream().min(Double::compareTo).orElseThrow(VerifyException::new);
       int nbOccurrenceOfRepeatedWeight =
           (int) weights.stream().filter(weight -> weight.equals(repeatedWeight)).count();
-      int nbToDuplicate = marks.size() - weights.size();
+      int nbToDuplicate = nbMarks - weights.size();
       int roundedNbToDuplicatePerOccurrence = DoubleMath
           .roundToInt((double) nbToDuplicate / nbOccurrenceOfRepeatedWeight, RoundingMode.DOWN);
       int remainder =
@@ -83,26 +97,26 @@ public final class Owa extends Aggregator {
       effectiveWeights = effectiveWeightsBuilder.build();
     } else {
       double smallestAcceptedWeight = weights.stream().sorted(Comparator.reverseOrder())
-          .limit(marks.size()).min(Double::compareTo).orElseThrow(VerifyException::new);
-      effectiveWeights = weights.stream().filter(w -> smallestAcceptedWeight <= w)
-          .limit(marks.size()).collect(ImmutableList.toImmutableList());
+          .limit(nbMarks).min(Double::compareTo).orElseThrow(VerifyException::new);
+      effectiveWeights = weights.stream().filter(w -> smallestAcceptedWeight <= w).limit(nbMarks)
+          .collect(ImmutableList.toImmutableList());
     }
-    verify(effectiveWeights.size() == marks.size(),
+    verify(effectiveWeights.size() == nbMarks,
         "Effective weights size must equal the number of marks.");
     double totalWeight = effectiveWeights.stream().mapToDouble(Double::doubleValue).sum();
     verify(0d < totalWeight, "Total weight must be positive.");
 
-    List<Mark> orderedMarks = new ArrayList<>(marks);
-    orderedMarks.sort(Comparator.reverseOrder());
-
-    double result = 0d;
-    for (int index = 0; index < orderedMarks.size(); ++index) {
-      result += orderedMarks.get(index).value() * effectiveWeights.get(index) / totalWeight;
-    }
-    if (marks.stream().map(Mark::value).anyMatch(d -> Double.isNaN(d))) {
-      verify(Double.isNaN(result), "Result must be NaN if any mark is NaN.");
-    }
-    return result;
+    ImmutableMap<Criterion, Mark> map = marks.map();
+    ImmutableSet<Criterion> sortedCriteria = map.keySet().stream()
+        .sorted(Comparator.comparing(criterion -> map.get(criterion), Comparator.reverseOrder()))
+        .collect(ImmutableSet.toImmutableSet());
+    verify(effectiveWeights.size() == sortedCriteria.size(),
+        "Effective weights size must equal the number of criteria.");
+    ImmutableMap.Builder<Criterion, Double> b = ImmutableMap.builder();
+    Streams.forEachPair(sortedCriteria.stream(), effectiveWeights.stream(),
+        (criterion, weight) -> b.put(criterion, weight / totalWeight));
+    ImmutableMap<Criterion, Double> normalizedWeights = b.build();
+    return Aggregator.WeightedMarks.given(marks, normalizedWeights).weightedAverage();
   }
 
   public ImmutableList<Double> weights() {
@@ -125,17 +139,18 @@ public final class Owa extends Aggregator {
       return false;
     }
     final Owa t2 = (Owa) o2;
-    return weights.equals(t2.weights)        && subs().equals(t2.subs())
+    return weights.equals(t2.weights) && subs().equals(t2.subs())
         && defaultSub().equals(t2.defaultSub());
   }
-  
+
   @Override
   public int hashCode() {
     return Objects.hash(weights, subs(), defaultSub());
   }
-  
+
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this).add("weights", weights).add("subs", subs()).add("defaultSub", defaultSub()).toString();
+    return MoreObjects.toStringHelper(this).add("weights", weights).add("subs", subs())
+        .add("defaultSub", defaultSub()).toString();
   }
 }
