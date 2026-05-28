@@ -62,8 +62,8 @@ public final class Weighter extends Aggregator {
 
     double result = 0d;
     for (Map.Entry<Criterion, Double> entry : marks.entrySet()) {
-      double weight = weights.getOrDefault(entry.getKey(), missingShare);
-      result += entry.getValue() * weight / totalWeight;
+      double weight = weights.getOrDefault(entry.getKey(), missingShare) / totalWeight;
+      result += entry.getValue() * weight;
     }
     return result;
   }
