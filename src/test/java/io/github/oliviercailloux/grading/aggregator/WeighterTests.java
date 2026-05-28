@@ -15,7 +15,7 @@ public class WeighterTests {
 	void testAggregateSameCriteria() {
 		Weighter weighter = givenWeighter(ImmutableMap.of(c("a"), 0.25d, c("b"), 0.75d));
 
-		double actual = weighter.aggregate(ImmutableMap.of(c("a"), 0.2d, c("b"), 0.8d));
+		double actual = weighter.aggregate(TestUtils.givenMarksTree("a", 0.2d, "b", 0.8d));
 
 		assertEquals(0.65d, actual, 1e-12);
 	}
@@ -25,7 +25,7 @@ public class WeighterTests {
 		Weighter weighter = givenWeighter(ImmutableMap.of(c("a"), 0.25d, c("b"), 0.25d));
 
 		double actual = weighter.aggregate(
-				ImmutableMap.of(c("a"), 0.2d, c("b"), 0.8d, c("c"), 0.6d));
+				TestUtils.givenMarksTree("a", 0.2d, "b", 0.8d, "c", 0.6d));
 
 		assertEquals(0.55d, actual, 1e-12);
 	}
@@ -35,7 +35,7 @@ public class WeighterTests {
 		Weighter weighter = givenWeighter(
 				ImmutableMap.of(c("a"), 0.6d, c("b"), 0.4d, c("c"), 0.0d));
 
-		double actual = weighter.aggregate(ImmutableMap.of(c("a"), 0.2d, c("b"), 0.8d));
+		double actual = weighter.aggregate(TestUtils.givenMarksTree("a", 0.2d, "b", 0.8d));
 
 		assertEquals(0.44d, actual, 1e-12);
 	}
@@ -44,7 +44,7 @@ public class WeighterTests {
 	void testAggregateMixedCriteria() {
 		Weighter weighter = givenWeighter(ImmutableMap.of(c("a"), 4d, c("b"), 1d));
 
-		double actual = weighter.aggregate(ImmutableMap.of(c("a"), 0.2d, c("c"), 0.8d));
+		double actual = weighter.aggregate(TestUtils.givenMarksTree("a", 0.2d, "c", 0.8d));
 		assertEquals(0.2d, actual, 1e-12);
 	}
 
@@ -52,7 +52,7 @@ public class WeighterTests {
 	void testAggregateMixedCriteriaComplement() {
 		Weighter weighter = givenWeighter(ImmutableMap.of(c("a"), 0.4d, c("b"), 1d));
 
-		double actual = weighter.aggregate(ImmutableMap.of(c("a"), 0.2d, c("c"), 0.8d));
+		double actual = weighter.aggregate(TestUtils.givenMarksTree("a", 0.2d, "c", 0.8d));
 		assertEquals(0.56d, actual, 1e-12);
 	}
 
@@ -60,7 +60,7 @@ public class WeighterTests {
 	void testAggregateReturnsZeroWhenTotalWeightIsZero() {
 		Weighter weighter = givenWeighter(ImmutableMap.of(c("a"), 0.0d, c("b"), 0.0d));
 
-		double actual = weighter.aggregate(ImmutableMap.of(c("a"), 0.2d, c("b"), 0.8d));
+		double actual = weighter.aggregate(TestUtils.givenMarksTree("a", 0.2d, "b"  , 0.8d));
 
 		assertEquals(0.0d, actual, 1e-12);
 	}
@@ -69,7 +69,7 @@ public class WeighterTests {
 	void testAverage() {
 		Weighter weighter = givenWeighter(ImmutableMap.of());
 
-		double actual = weighter.aggregate(ImmutableMap.of(c("a"), 0.3d, c("b"), 0.9d));
+		double actual = weighter.aggregate(TestUtils.givenMarksTree("a", 0.3d, "b", 0.9d));
 
 		assertEquals(0.6d, actual, 1e-12);
 	}

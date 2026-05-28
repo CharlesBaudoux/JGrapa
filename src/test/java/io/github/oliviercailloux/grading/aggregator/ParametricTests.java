@@ -14,7 +14,7 @@ public class ParametricTests {
   void testAggregateWithWeightingAndMultipliedOnly() {
     Parametric parametric = givenParametric();
 
-    double actual = parametric.aggregate(ImmutableMap.of(multiplied(), 0.8d, weighting(), 0.25d));
+    double actual = parametric.aggregate(TestUtils.givenMarksTree("multiplied", 0.8d, "weighting", 0.25d));
 
     double weightedSum = 0.8d * 0.25d;
     assertEquals(weightedSum, actual, 1e-12);
@@ -25,17 +25,17 @@ public class ParametricTests {
     Parametric parametric = givenParametric();
 
     double actual = parametric
-        .aggregate(ImmutableMap.of(multiplied(), 0.8d, weighting(), 0.25d, other(), 0.4d));
+        .aggregate(TestUtils.givenMarksTree("multiplied", 0.8d, "weighting", 0.25d, "other", 0.4d));
 
     double weightedSum = 0.8d * 0.25d + 0.4d * (1d - 0.25d);
     assertEquals(weightedSum, actual, 1e-12);
   }
 
   @Test
-  void testAggregateMissingMultipliedReturnsNaN() {
+  void testAggregateMissingMultiplied() {
     Parametric parametric = givenParametric();
 
-    double actual = parametric.aggregate(ImmutableMap.of(weighting(), 0.25d, other(), 0.4d));
+    double actual = parametric.aggregate(TestUtils.givenMarksTree("weighting", 0.25d, "other", 0.4d));
 
     assertTrue(Double.isNaN(actual));
   }
@@ -44,7 +44,7 @@ public class ParametricTests {
   void testAggregateMissingWeightingReturnsNaN() {
     Parametric parametric = givenParametric();
 
-    double actual = parametric.aggregate(ImmutableMap.of(multiplied(), 0.8d, other(), 0.4d));
+    double actual = parametric.aggregate(TestUtils.givenMarksTree("multiplied", 0.8d, "other", 0.4d));
 
     assertTrue(Double.isNaN(actual));
   }
@@ -54,7 +54,7 @@ public class ParametricTests {
     Parametric parametric = givenParametric();
 
     double actual = parametric.aggregate(
-        ImmutableMap.of(multiplied(), 0.8d, weighting(), 0.25d, other(), 0.4d, c("d"), 0.3d));
+        TestUtils.givenMarksTree("multiplied", 0.8d, "weighting", 0.25d, "other", 0.4d, "d", 0.3d));
 
     assertTrue(Double.isNaN(actual));
   }
@@ -64,7 +64,7 @@ public class ParametricTests {
     Parametric parametric = givenParametric();
 
     double actual = parametric
-        .aggregate(ImmutableMap.of(multiplied(), -0.8d, weighting(), 0.25d, other(), 0.4d));
+        .aggregate(TestUtils.givenMarksTree("multiplied", -0.8d, "weighting", 0.25d, "other", 0.4d));
 
     double weightedSum = -0.8d * 0.25d + 0.4d * (1d - 0.25d);
     assertEquals(weightedSum, actual, 1e-12);
@@ -80,10 +80,6 @@ public class ParametricTests {
 
   private static Criterion weighting() {
     return c("weighting");
-  }
-
-  private static Criterion other() {
-    return c("other");
   }
 
   private static Criterion c(String name) {

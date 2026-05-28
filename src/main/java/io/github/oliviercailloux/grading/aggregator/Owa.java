@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
 import com.google.common.math.DoubleMath;
 import io.github.oliviercailloux.grading.Criterion;
+import io.github.oliviercailloux.grading.assessment.Mark;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -44,14 +45,14 @@ public final class Owa extends Aggregator {
   }
 
   @Override
-  public double aggregate(Map<Criterion, Double> marks) {
-    return aggregate(ImmutableMultiset.copyOf(marks.values()));
+  public double aggregate(OneLevelMarksTree marks) {
+    return aggregate(ImmutableMultiset.copyOf(marks.map().values()));
   }
 
   /**
    * @param marks non-empty
    */
-  public double aggregate(Multiset<Double> marks) {
+  public double aggregate(Multiset<Mark> marks) {
     checkArgument(!marks.isEmpty(), "Marks must be non-empty.");
 
     final ImmutableList<Double> effectiveWeights;
@@ -91,14 +92,14 @@ public final class Owa extends Aggregator {
     double totalWeight = effectiveWeights.stream().mapToDouble(Double::doubleValue).sum();
     verify(0d < totalWeight, "Total weight must be positive.");
 
-    List<Double> orderedMarks = new ArrayList<>(marks);
+    List<Mark> orderedMarks = new ArrayList<>(marks);
     orderedMarks.sort(Comparator.reverseOrder());
 
     double result = 0d;
     for (int index = 0; index < orderedMarks.size(); ++index) {
-      result += orderedMarks.get(index) * effectiveWeights.get(index) / totalWeight;
+      result += orderedMarks.get(index).value() * effectiveWeights.get(index) / totalWeight;
     }
-    if (marks.stream().anyMatch(d -> Double.isNaN(d))) {
+    if (marks.stream().map(Mark::value).anyMatch(d -> Double.isNaN(d))) {
       verify(Double.isNaN(result), "Result must be NaN if any mark is NaN.");
     }
     return result;

@@ -1,14 +1,28 @@
 package io.github.oliviercailloux.grading.aggregator;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.oliviercailloux.grading.Criterion;
+import io.github.oliviercailloux.grading.assessment.Mark;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
+  public static record OneLevelMarksTree (/**
+                                           * non-empty
+                                           */
+  ImmutableMap<Criterion, Mark> map) {
+    public static OneLevelMarksTree given(Map<Criterion, Mark> marks) {
+      return new OneLevelMarksTree(ImmutableMap.copyOf(marks));
+    }
+
+    public OneLevelMarksTree {
+      checkArgument(!map.isEmpty(), "marks cannot be empty");
+    }
+  }
 
   private final ImmutableMap<Criterion, Aggregator> subs;
   private final Optional<Aggregator> defaultSub;
@@ -31,10 +45,7 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
     return subAggregators.build();
   }
 
-  /**
-   * @param marks non-empty
-   */
-  public abstract double aggregate(Map<Criterion, Double> marks);
+  public abstract double aggregate(OneLevelMarksTree marks);
 
   public ImmutableMap<Criterion, Aggregator> subs() {
     return subs;

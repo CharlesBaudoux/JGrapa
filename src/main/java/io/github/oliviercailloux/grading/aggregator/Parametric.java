@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.oliviercailloux.grading.Criterion;
+import io.github.oliviercailloux.grading.assessment.Mark;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,18 +41,17 @@ public final class Parametric extends Aggregator {
   }
 
   @Override
-  public double aggregate(Map<Criterion, Double> marks) {
-    checkNotNull(marks);
-    ImmutableSet<Criterion> otherCriteria = marks.keySet().stream()
+  public double aggregate(OneLevelMarksTree marks) {
+    ImmutableSet<Criterion> otherCriteria = marks.map().keySet().stream()
         .filter(criterion -> !criterion.equals(multiplied) && !criterion.equals(weighting))
         .collect(ImmutableSet.toImmutableSet());
-    double weightingMark = marks.getOrDefault(weighting, 1d);
+    double weightingMark = marks.map().getOrDefault(weighting, Mark.max()).value();
     ImmutableMap.Builder<Criterion, Double> weightsBuilder = ImmutableMap.builder();
     weightsBuilder.put(multiplied, weightingMark);
     otherCriteria.forEach(criterion -> weightsBuilder.put(criterion, (1d - weightingMark) / otherCriteria.size()));
     ImmutableMap<Criterion, Double> effectiveWeights = weightsBuilder.build();
     double result = effectiveWeights.keySet().stream()
-        .mapToDouble(criterion -> marks.getOrDefault(criterion, 1d) * effectiveWeights.get(criterion))
+        .mapToDouble(criterion -> marks.map().getOrDefault(criterion, Mark.max()).value() * effectiveWeights.get(criterion))
         .sum();
     return result;
   }

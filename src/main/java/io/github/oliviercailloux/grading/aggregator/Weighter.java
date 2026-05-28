@@ -1,13 +1,13 @@
 package io.github.oliviercailloux.grading.aggregator;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.github.oliviercailloux.grading.Criterion;
+import io.github.oliviercailloux.grading.assessment.Mark;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,16 +33,13 @@ public final class Weighter extends Aggregator {
   }
 
   @Override
-  public double aggregate(Map<Criterion, Double> marks) {
-    checkNotNull(marks);
-    checkArgument(!marks.isEmpty(), "Marks must be non-empty.");
-
+  public double aggregate(OneLevelMarksTree marks) {
     ImmutableSet<Criterion> missingInWeights =
-        Sets.difference(marks.keySet(), weights.keySet()).immutableCopy();
+        Sets.difference(marks.map().keySet(), weights.keySet()).immutableCopy();
 
     double explicitWeightSum = 0d;
     for (Map.Entry<Criterion, Double> entry : weights.entrySet()) {
-      if (marks.containsKey(entry.getKey())) {
+      if (marks.map().containsKey(entry.getKey())) {
         explicitWeightSum += entry.getValue();
       }
     }
@@ -54,16 +51,16 @@ public final class Weighter extends Aggregator {
     }
 
     final double totalWeight =
-        Sets.intersection(marks.keySet(), weights.keySet()).stream().mapToDouble(weights::get).sum()
+        Sets.intersection(marks.map().keySet(), weights.keySet()).stream().mapToDouble(weights::get).sum()
             + complement;
     if (totalWeight == 0d) {
       return 0d;
     }
 
     double result = 0d;
-    for (Map.Entry<Criterion, Double> entry : marks.entrySet()) {
+    for (Map.Entry<Criterion, Mark> entry : marks.map().entrySet()) {
       double weight = weights.getOrDefault(entry.getKey(), missingShare) / totalWeight;
-      result += entry.getValue() * weight;
+      result += entry.getValue().value() * weight;
     }
     return result;
   }
