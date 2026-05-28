@@ -116,7 +116,7 @@ public final class Owa extends Aggregator {
     Streams.forEachPair(sortedCriteria.stream(), effectiveWeights.stream(),
         (criterion, weight) -> b.put(criterion, weight / totalWeight));
     ImmutableMap<Criterion, Double> normalizedWeights = b.build();
-    return Aggregator.WeightedMarks.given(marks, normalizedWeights).weightedAverage();
+    return Aggregator.WeightedMarks.given(marks, normalizedWeights).weightedSum();
   }
 
   public ImmutableList<Double> weights() {

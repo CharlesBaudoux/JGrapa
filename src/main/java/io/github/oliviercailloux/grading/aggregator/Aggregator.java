@@ -52,7 +52,7 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
     public static WeightedMarks given(OneLevelMarksTree marks, Map<Criterion, Double> weights) {
       return new WeightedMarks(marks, weights);
     }
-    private static final double TOLERANCE = 1e-9;
+    public static final double TOLERANCE = 1e-9;
     private final OneLevelMarksTree marks;
     private final ImmutableMap<Criterion, Double> weights;
 
@@ -62,7 +62,7 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
       checkArgument(weights.values().stream().allMatch(w -> 0d <= w),
       "All weights must be non-negative.");
       double totalWeight = weights.values().stream().mapToDouble(Double::doubleValue).sum();
-      checkArgument(DoubleMath.fuzzyEquals(totalWeight, 1d, TOLERANCE), "Total weight must be one.");
+      checkArgument(totalWeight <= 1d + TOLERANCE, "Total weight must be at most one.");
       checkArgument(marks.map().keySet().equals(weights.keySet()), "Marks and weights must have the same criteria.");
       this.marks = checkNotNull(marks);
       this.weights = ImmutableMap.copyOf(weights);
@@ -76,7 +76,7 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
     }
     
     /**
-     * @return sum to one, non-negative, no NaN
+     * @return sum to at most one (up to {@link WeightedMarks#TOLERANCE}), non-negative, no NaN
      */
     public ImmutableMap<Criterion, Double> weights() {
       return weights;
@@ -100,7 +100,7 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
       return weights.get(criterion);
     }
 
-    public double weightedAverage() {
+    public double weightedSum() {
       double result = 0d;
       for (Criterion criterion : criteria()) {
         result += mark(criterion).value() * weight(criterion);
