@@ -33,7 +33,7 @@ public final class Weighter extends Aggregator {
   }
 
   @Override
-  public double aggregate(OneLevelMarksTree marks) {
+  public WeightedMarks aggregate(OneLevelMarksTree marks) {
     ImmutableSet<Criterion> missingInWeights =
         Sets.difference(marks.criteria(), weights.keySet()).immutableCopy();
 
@@ -59,7 +59,7 @@ public final class Weighter extends Aggregator {
         marks.criteria().stream().collect(ImmutableMap.toImmutableMap(c -> c,
             c -> weights.getOrDefault(c, missingShare) / normalizationFactor));
 
-    return Aggregator.WeightedMarks.given(marks, effectiveWeights).weightedSum();
+    return Aggregator.WeightedMarks.given(marks, effectiveWeights);
   }
 
   public ImmutableMap<Criterion, Double> weights() {

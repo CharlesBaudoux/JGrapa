@@ -19,7 +19,7 @@ public class OwaTests {
   void testAggregateSameNumberOfWeightsAndMarks() {
     Owa owa = givenOwa(ImmutableList.of(0.7d, 0.3d));
 
-    double actual = owa.aggregate(TestUtils.givenMarksTree("a", 0.1d, "b", 0.9d));
+    double actual = owa.aggregate(TestUtils.givenMarksTree("a", 0.1d, "b", 0.9d)).weightedSum();
 
     assertEquals(0.66d, actual, 1e-12);
   }
@@ -29,7 +29,7 @@ public class OwaTests {
     Owa owa = givenOwa(ImmutableList.of(1d, 3d, 1d));
 
     double actual = owa.aggregate(
-        TestUtils.givenMarksTree("a", 0.6d, "b", 0.8d, "c", 1d, "d", 0.4d, "e", 0.2d, "f", 0d));
+        TestUtils.givenMarksTree("a", 0.6d, "b", 0.8d, "c", 1d, "d", 0.4d, "e", 0.2d, "f", 0d)).weightedSum();
 
     double weightedSum =
         1d * (1d / 3d) + 0.8d * (1d / 3d) + 0.6d * (1d / 3d) + 0.4d * 3d + 0.2d * (1d / 2d);
@@ -41,7 +41,7 @@ public class OwaTests {
   void testAggregateWithFewerMarksThanWeights() {
     Owa owa = givenOwa(ImmutableList.of(1d, 3d, 1d));
 
-    double actual = owa.aggregate(TestUtils.givenMarksTree("a", 0d, "b", 1d));
+    double actual = owa.aggregate(TestUtils.givenMarksTree("a", 0d, "b", 1d)).weightedSum();
 
     double weightedSum = 1d * 1d + 0d * 3d;
     double totalWeight = 1d + 3d;
@@ -52,7 +52,7 @@ public class OwaTests {
   void testMaxBehavior() {
     Owa owa = givenOwa(ImmutableList.of(1d, 0d));
 
-    double actual = owa.aggregate(TestUtils.givenMarksTree("a", 0.2d, "b", 0.8d));
+    double actual = owa.aggregate(TestUtils.givenMarksTree("a", 0.2d, "b", 0.8d)).weightedSum();
 
     assertEquals(0.8d, actual, 1e-12);
   }

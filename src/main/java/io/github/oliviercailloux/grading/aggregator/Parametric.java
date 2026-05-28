@@ -43,7 +43,7 @@ public final class Parametric extends Aggregator {
   }
 
   @Override
-  public double aggregate(OneLevelMarksTree marks) {
+  public WeightedMarks aggregate(OneLevelMarksTree marks) {
     ImmutableMap<Criterion, Double> effectiveWeights;
     {
       double weightingMark = marks.optionalMark(weighting).orElse(Mark.max()).value();
@@ -68,8 +68,7 @@ public final class Parametric extends Aggregator {
     }
     verify(effectiveMarks.keySet().equals(effectiveWeights.keySet()),
         "The effective marks and weights must be defined on the same criteria.");
-    return Aggregator.WeightedMarks.given(OneLevelMarksTree.given(effectiveMarks), effectiveWeights)
-        .weightedSum();
+    return Aggregator.WeightedMarks.given(OneLevelMarksTree.given(effectiveMarks), effectiveWeights);
   }
 
   public Criterion multiplied() {

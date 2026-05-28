@@ -63,11 +63,11 @@ public final class Owa extends Aggregator {
       marksBuilder.put(Criterion.given(markNb), mark);
       ++index;
     }
-    return aggregate(OneLevelMarksTree.given(marksBuilder.build()));
+    return aggregate(OneLevelMarksTree.given(marksBuilder.build())).weightedSum();
   }
 
   @Override
-  public double aggregate(OneLevelMarksTree marks) {
+  public WeightedMarks aggregate(OneLevelMarksTree marks) {
     int nbMarks = marks.map().size();
     final ImmutableList<Double> effectiveWeights;
     if (weights.size() <= nbMarks) {
@@ -116,7 +116,7 @@ public final class Owa extends Aggregator {
     Streams.forEachPair(sortedCriteria.stream(), effectiveWeights.stream(),
         (criterion, weight) -> b.put(criterion, weight / totalWeight));
     ImmutableMap<Criterion, Double> normalizedWeights = b.build();
-    return Aggregator.WeightedMarks.given(marks, normalizedWeights).weightedSum();
+    return Aggregator.WeightedMarks.given(marks, normalizedWeights);
   }
 
   public ImmutableList<Double> weights() {

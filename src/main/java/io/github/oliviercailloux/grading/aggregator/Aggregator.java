@@ -124,7 +124,7 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
     }
   }
 
-  public abstract double aggregate(OneLevelMarksTree marks);
+  public abstract WeightedMarks aggregate(OneLevelMarksTree marks);
 
   public ImmutableMap<Criterion, Aggregator> subs() {
     return subs;
