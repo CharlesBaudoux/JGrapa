@@ -35,7 +35,7 @@ public final class Weighter extends Aggregator {
   @Override
   public double aggregate(OneLevelMarksTree marks) {
     ImmutableSet<Criterion> missingInWeights =
-        Sets.difference(marks.map().keySet(), weights.keySet()).immutableCopy();
+        Sets.difference(marks.criteria(), weights.keySet()).immutableCopy();
 
     double explicitWeightSum = 0d;
     for (Map.Entry<Criterion, Double> entry : weights.entrySet()) {
@@ -43,26 +43,23 @@ public final class Weighter extends Aggregator {
         explicitWeightSum += entry.getValue();
       }
     }
-
-    double missingShare = 0d;
     double complement = Math.max(0d, 1d - explicitWeightSum);
-    if (!missingInWeights.isEmpty()) {
+
+    final double missingShare;
+    if (missingInWeights.isEmpty()) {
+      missingShare = 0d;
+    } else {
       missingShare = complement / missingInWeights.size();
     }
 
-    final double totalWeight =
-        Sets.intersection(marks.map().keySet(), weights.keySet()).stream().mapToDouble(weights::get).sum()
-            + complement;
-    if (totalWeight == 0d) {
-      return 0d;
-    }
+    final double totalWeight = Sets.intersection(marks.criteria(), weights.keySet()).stream()
+        .mapToDouble(weights::get).sum() + complement;
+    final double normalizationFactor = totalWeight == 0d ? 1d : totalWeight;
+    ImmutableMap<Criterion, Double> effectiveWeights =
+        marks.criteria().stream().collect(ImmutableMap.toImmutableMap(c -> c,
+            c -> weights.getOrDefault(c, missingShare) / normalizationFactor));
 
-    double result = 0d;
-    for (Map.Entry<Criterion, Mark> entry : marks.map().entrySet()) {
-      double weight = weights.getOrDefault(entry.getKey(), missingShare) / totalWeight;
-      result += entry.getValue().value() * weight;
-    }
-    return result;
+    return Aggregator.WeightedMarks.given(marks, effectiveWeights).weightedSum();
   }
 
   public ImmutableMap<Criterion, Double> weights() {

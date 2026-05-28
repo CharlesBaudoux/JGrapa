@@ -25,6 +25,21 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
     public OneLevelMarksTree {
       checkArgument(!map.isEmpty(), "marks cannot be empty");
     }
+
+    public Mark mark(Criterion criterion) {
+      if (!map.containsKey(criterion)) {
+        throw new NoSuchElementException("Criterion not found: " + criterion);
+      }
+      return map.get(criterion);
+    }
+
+    public Optional<Mark> optionalMark(Criterion criterion) {
+      return Optional.ofNullable(map.get(criterion));
+    }
+
+    public ImmutableSet<Criterion> criteria() {
+      return map.keySet();
+    }
   }
 
   private final ImmutableMap<Criterion, Aggregator> subs;

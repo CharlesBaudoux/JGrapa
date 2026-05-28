@@ -46,11 +46,11 @@ public final class Parametric extends Aggregator {
   public double aggregate(OneLevelMarksTree marks) {
     ImmutableMap<Criterion, Double> effectiveWeights;
     {
-      double weightingMark = marks.map().getOrDefault(weighting, Mark.max()).value();
+      double weightingMark = marks.optionalMark(weighting).orElse(Mark.max()).value();
       ImmutableMap.Builder<Criterion, Double> weightsBuilder = ImmutableMap.builder();
       ImmutableSet<Criterion> aPrioriCriteria = ImmutableSet.of(weighting, multiplied);
       ImmutableSet<Criterion> otherCriteria =
-          Sets.difference(marks.map().keySet(), aPrioriCriteria).immutableCopy();
+          Sets.difference(marks.criteria(), aPrioriCriteria).immutableCopy();
       weightsBuilder.put(multiplied, weightingMark);
       otherCriteria.forEach(
           criterion -> weightsBuilder.put(criterion, (1d - weightingMark) / otherCriteria.size()));
@@ -59,9 +59,9 @@ public final class Parametric extends Aggregator {
     final ImmutableMap<Criterion, Mark> effectiveMarks;
     {
       ImmutableMap.Builder<Criterion, Mark> builder = ImmutableMap.<Criterion, Mark>builder();
-      marks.map().keySet().stream().filter(criterion -> !criterion.equals(weighting))
-          .forEach(criterion -> builder.put(criterion, marks.map().get(criterion)));
-      if (!marks.map().containsKey(multiplied)) {
+      marks.criteria().stream().filter(criterion -> !criterion.equals(weighting))
+          .forEach(criterion -> builder.put(criterion, marks.mark(criterion)));
+      if (marks.optionalMark(multiplied).isEmpty()) {
         builder.put(multiplied, Mark.max());
       }
       effectiveMarks = builder.build();
