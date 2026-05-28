@@ -133,9 +133,7 @@ public class AssessmentTreeJsonConverter {
     }
     Map<Criterion, AssessmentTree> children = new LinkedHashMap<>();
     for (Map.Entry<String, JsonNode> property : node.properties()) {
-      String key = property.getKey();
-      verify(!key.isEmpty(), "Criterion name must not be empty.");
-      Criterion criterion = Criterion.given(key);
+      Criterion criterion = Criterion.given(property.getKey());
       JsonNode value = property.getValue();
       if (!(value instanceof ObjectNode objectValue)) {
         throw new VerifyException(

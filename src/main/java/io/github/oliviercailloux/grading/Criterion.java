@@ -1,6 +1,7 @@
 package io.github.oliviercailloux.grading;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
 import java.io.Serializable;
@@ -16,14 +17,11 @@ public class Criterion implements Serializable {
   private final String name;
 
   Criterion(String name) {
-    checkArgument(!name.isEmpty());
-    this.name = name;
+    this.name = checkNotNull(name);
   }
 
   /**
    * Returns the name of this criterion.
-   * 
-   * @return not empty.
    */
   public String name() {
     return name;

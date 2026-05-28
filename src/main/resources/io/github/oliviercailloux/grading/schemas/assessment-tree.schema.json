@@ -32,9 +32,6 @@
     },
     "composite": {
       "type": "object",
-      "propertyNames": {
-        "minLength": 1
-      },
       "additionalProperties": {
         "$ref": "#/$defs/assessmentTree"
       },
