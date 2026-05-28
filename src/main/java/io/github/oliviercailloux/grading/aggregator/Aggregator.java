@@ -3,13 +3,14 @@ package io.github.oliviercailloux.grading.aggregator;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.math.DoubleMath;
 import io.github.oliviercailloux.grading.Criterion;
 import io.github.oliviercailloux.grading.assessment.Mark;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -121,6 +122,25 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
         result += mark(criterion).value() * weight(criterion);
       }
       return result;
+    }
+
+    @Override
+    public boolean equals(Object o2) {
+      if (!(o2 instanceof WeightedMarks)) {
+        return false;
+      }
+      final WeightedMarks t2 = (WeightedMarks) o2;
+      return this.marks.equals(t2.marks) && this.weights.equals(t2.weights);
+    }
+    
+    @Override
+    public int hashCode() {
+      return Objects.hash(marks, weights);
+    }
+    
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this).add("marks", marks).add("weights", weights).toString();
     }
   }
 

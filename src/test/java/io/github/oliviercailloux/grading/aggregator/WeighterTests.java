@@ -1,10 +1,10 @@
 package io.github.oliviercailloux.grading.aggregator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.oliviercailloux.grading.Criterion;
+import io.github.oliviercailloux.grading.aggregator.Aggregator.WeightedMarks;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -13,12 +13,14 @@ public class WeighterTests {
 
   @Test
   void testAggregateSameCriteria() {
-    Weighter weighter = givenWeighter(ImmutableMap.of(c("a"), 0.25d, c("b"), 0.75d));
+    ImmutableMap<Criterion, Double> weights = ImmutableMap.of(c("a"), 0.25d, c("b"), 0.75d);
+    Weighter weighter = givenWeighter(weights);
 
-    double actual =
-        weighter.aggregate(TestUtils.givenMarksTree("a", 0.2d, "b", 0.8d)).weightedSum();
+    WeightedMarks actual = weighter.aggregate(TestUtils.givenMarksTree("a", 0.2d, "b", 0.8d));
 
-    assertEquals(0.65d, actual, 1e-12);
+    assertEquals(WeightedMarks.given(TestUtils.givenMarksTree("a", 0.2d, "b", 0.8d),
+        ImmutableMap.of(c("a"), 0.25d, c("b"), 0.75d)), actual);
+    assertEquals(0.65d, actual.weightedSum(), 1e-12);
   }
 
   @Test
