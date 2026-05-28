@@ -12,7 +12,6 @@ import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.dialect.Dialects;
 import io.github.oliviercailloux.grading.Criterion;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,7 +70,7 @@ public class AggregatorJsonConverter {
         if (!weighter.weights().isEmpty()) {
           ObjectNode weightsNode = mapper.createObjectNode();
           for (Map.Entry<Criterion, Double> entry : weighter.weights().entrySet()) {
-            weightsNode.put(entry.getKey().getName(), entry.getValue());
+            weightsNode.put(entry.getKey().name(), entry.getValue());
           }
           node.set("weights", weightsNode);
         }
@@ -87,8 +86,8 @@ public class AggregatorJsonConverter {
       }
       case Parametric parametric -> {
         ObjectNode node = mapper.createObjectNode();
-        node.put("multiplied", parametric.multiplied().getName());
-        node.put("weighting", parametric.weighting().getName());
+        node.put("multiplied", parametric.multiplied().name());
+        node.put("weighting", parametric.weighting().name());
         yield node;
       }
     };
@@ -100,7 +99,7 @@ public class AggregatorJsonConverter {
     if (!aggregator.subs().isEmpty()) {
       ObjectNode subsNode = mapper.createObjectNode();
       for (Map.Entry<Criterion, Aggregator> entry : aggregator.subs().entrySet()) {
-        subsNode.set(entry.getKey().getName(), toJsonNode(entry.getValue()));
+        subsNode.set(entry.getKey().name(), toJsonNode(entry.getValue()));
       }
       node.set("subs", subsNode);
     }

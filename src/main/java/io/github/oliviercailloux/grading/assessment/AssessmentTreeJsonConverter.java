@@ -95,7 +95,7 @@ public class AssessmentTreeJsonConverter {
       case CompositeAssessmentTree composite -> {
         ObjectNode node = mapper.createObjectNode();
         for (Map.Entry<Criterion, AssessmentTree> entry : composite.getChildren().entrySet()) {
-          node.set(entry.getKey().getName(), toJsonInternal(entry.getValue()));
+          node.set(entry.getKey().name(), toJsonInternal(entry.getValue()));
         }
         yield node;
       }
@@ -133,7 +133,9 @@ public class AssessmentTreeJsonConverter {
     }
     Map<Criterion, AssessmentTree> children = new LinkedHashMap<>();
     for (Map.Entry<String, JsonNode> property : node.properties()) {
-      Criterion criterion = Criterion.given(property.getKey());
+      String key = property.getKey();
+      verify(!key.isEmpty(), "Criterion name must not be empty.");
+      Criterion criterion = Criterion.given(key);
       JsonNode value = property.getValue();
       if (!(value instanceof ObjectNode objectValue)) {
         throw new VerifyException(
