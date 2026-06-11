@@ -68,18 +68,20 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
     public static WeightedMarks given(OneLevelMarksTree marks, Map<Criterion, Double> weights) {
       return new WeightedMarks(marks, weights);
     }
+
     public static final double TOLERANCE = 1e-9;
     private final OneLevelMarksTree marks;
     private final ImmutableMap<Criterion, Double> weights;
 
     private WeightedMarks(OneLevelMarksTree marks, Map<Criterion, Double> weights) {
       checkArgument(weights.values().stream().allMatch(w -> Double.isFinite(w)),
-      "All weights must be finite.");
+          "All weights must be finite.");
       checkArgument(weights.values().stream().allMatch(w -> 0d <= w),
-      "All weights must be non-negative.");
+          "All weights must be non-negative.");
       double totalWeight = weights.values().stream().mapToDouble(Double::doubleValue).sum();
       checkArgument(totalWeight <= 1d + TOLERANCE, "Total weight must be at most one.");
-      checkArgument(marks.map().keySet().equals(weights.keySet()), "Marks and weights must have the same criteria.");
+      checkArgument(marks.map().keySet().equals(weights.keySet()),
+          "Marks and weights must have the same criteria.");
       this.marks = checkNotNull(marks);
       this.weights = ImmutableMap.copyOf(weights);
     }
@@ -90,7 +92,7 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
     public OneLevelMarksTree marks() {
       return marks;
     }
-    
+
     /**
      * @return sum to at most one (up to {@link WeightedMarks#TOLERANCE}), non-negative, no NaN
      */
@@ -101,16 +103,16 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
     public ImmutableSet<Criterion> criteria() {
       return marks.map().keySet();
     }
-    
+
     public Mark mark(Criterion criterion) {
-      if(!marks.map().containsKey(criterion)) {
+      if (!marks.map().containsKey(criterion)) {
         throw new NoSuchElementException("Criterion not found: " + criterion);
       }
       return marks.map().get(criterion);
     }
 
     public double weight(Criterion criterion) {
-      if(!weights.containsKey(criterion)) {
+      if (!weights.containsKey(criterion)) {
         throw new NoSuchElementException("Criterion not found: " + criterion);
       }
       return weights.get(criterion);
@@ -132,15 +134,16 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
       final WeightedMarks t2 = (WeightedMarks) o2;
       return this.marks.equals(t2.marks) && this.weights.equals(t2.weights);
     }
-    
+
     @Override
     public int hashCode() {
       return Objects.hash(marks, weights);
     }
-    
+
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this).add("marks", marks).add("weights", weights).toString();
+      return MoreObjects.toStringHelper(this).add("marks", marks).add("weights", weights)
+          .toString();
     }
   }
 
@@ -150,8 +153,8 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
     return subs;
   }
 
-  public Optional<Aggregator> defaultSub() {
-    return defaultSub;
+  public Aggregator defaultSub() {
+    return defaultSub.orElse(Weighter.FULL_EQUAL_WEIGHTER);
   }
 
   public abstract Aggregator withSubs(Map<Criterion, Aggregator> newSubs);

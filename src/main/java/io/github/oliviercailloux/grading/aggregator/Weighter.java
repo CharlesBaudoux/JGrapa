@@ -13,8 +13,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class Weighter extends Aggregator {
-
-  private final ImmutableMap<Criterion, Double> weights;
+  /**The aggregator with equal weights for all criteria and with a default sub-aggregator that is itself. */
+  public static final Weighter FULL_EQUAL_WEIGHTER = given(ImmutableMap.of());
 
   public static Weighter given(Map<Criterion, Double> weights) {
     return new Weighter(weights, Map.of(), Optional.empty());
@@ -24,6 +24,8 @@ public final class Weighter extends Aggregator {
       Optional<Aggregator> defaultSub) {
     return new Weighter(weights, subs, defaultSub);
   }
+
+  private final ImmutableMap<Criterion, Double> weights;
 
   private Weighter(Map<Criterion, Double> weights, Map<Criterion, Aggregator> subs,
       Optional<Aggregator> defaultSub) {

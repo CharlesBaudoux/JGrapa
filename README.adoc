@@ -70,3 +70,5 @@ TODO
 ParametricAverager: w and m
 ParametricScaler: only w.
 
+TODO
+defaultSub(): always one, give weighter if none.

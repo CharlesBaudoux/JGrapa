@@ -7,10 +7,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Streams;
 import com.google.common.math.DoubleMath;
@@ -18,7 +15,6 @@ import com.google.common.math.IntMath;
 import io.github.oliviercailloux.grading.Criterion;
 import io.github.oliviercailloux.grading.assessment.Mark;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -30,17 +26,17 @@ public final class Owa extends Aggregator {
   private final ImmutableList<Double> weights;
 
   public static Owa given(List<Double> weights) {
-    return new Owa(weights, Map.of(), Optional.empty());
+    return new Owa(weights, Map.of(), Weighter.FULL_EQUAL_WEIGHTER);
   }
 
   public static Owa given(List<Double> weights, Map<Criterion, Aggregator> subs,
-      Optional<Aggregator> defaultSub) {
+      Aggregator defaultSub) {
     return new Owa(weights, subs, defaultSub);
   }
 
   private Owa(List<Double> weights, Map<Criterion, Aggregator> subs,
-      Optional<Aggregator> defaultSub) {
-    super(subs, defaultSub);
+      Aggregator defaultSub) {
+    super(subs, defaultSub == Weighter.FULL_EQUAL_WEIGHTER ? Optional.empty() : Optional.of(defaultSub));
     this.weights = ImmutableList.copyOf(weights);
     checkArgument(2 <= ImmutableSet.copyOf(this.weights).size(),
         "OWA weights must contain at least two different values.");
@@ -130,7 +126,7 @@ public final class Owa extends Aggregator {
 
   @Override
   public Owa withDefaultSub(Aggregator newDefaultSub) {
-    return new Owa(weights, subs(), Optional.of(newDefaultSub));
+    return new Owa(weights, subs(), newDefaultSub);
   }
 
   @Override
