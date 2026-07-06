@@ -14,7 +14,6 @@ import io.github.oliviercailloux.grading.Criterion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -103,7 +102,11 @@ public class AggregatorJsonConverter {
       }
       node.set("subs", subsNode);
     }
-    aggregator.defaultSub().ifPresent(defaultSub -> node.set("defaultSub", toJsonNode(defaultSub)));
+    
+    Aggregator defaultSub = aggregator.defaultSub();
+    if (defaultSub != null && defaultSub != Weighter.FULL_EQUAL_WEIGHTER) {
+      node.set("defaultSub", toJsonNode(defaultSub));
+    }
   }
 
   private Aggregator fromJsonNode(JsonNode node) {
@@ -120,7 +123,11 @@ public class AggregatorJsonConverter {
         });
 
     ImmutableMap<Criterion, Aggregator> subs = parseSubs(objectNode.get("subs"));
-    Optional<Aggregator> defaultSub = Optional.ofNullable(objectNode.get("defaultSub")).map(this::fromJsonNode);
+    
+    Aggregator defaultSub = null;
+    if (objectNode.has("defaultSub") && !objectNode.get("defaultSub").isNull()) {
+      defaultSub = fromJsonNode(objectNode.get("defaultSub"));
+    }
 
     boolean hasMultiplied = objectNode.has("multiplied");
     boolean hasWeighting = objectNode.has("weighting");

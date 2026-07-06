@@ -18,7 +18,16 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
+import org.junit.jupiter.api.BeforeAll;
+
 public class SchemaTests {
+
+  @BeforeAll
+  static void setLocale() {
+      Locale.setDefault(Locale.ENGLISH); 
+  }
+
   @SuppressWarnings("unused")
   private static final Logger LOGGER = LoggerFactory.getLogger(SchemaTests.class);
 
@@ -33,9 +42,9 @@ public class SchemaTests {
     List<Error> errors = draftSchema.validate(input, InputFormat.JSON);
     assertEquals(2, errors.size());
     Error e0 = errors.get(0);
-    assertTrue(e0.getMessage().contains("valeur dans l'énumération"), e0.getMessage());
+    assertTrue(e0.getMessage().contains("enumeration"), e0.getMessage());
     Error e1 = errors.get(1);
-    assertTrue(e1.getMessage().contains("array attendu"), e1.getMessage());
+    assertTrue(e1.getMessage().contains("array expected"), e1.getMessage());
   }
 
   @Test

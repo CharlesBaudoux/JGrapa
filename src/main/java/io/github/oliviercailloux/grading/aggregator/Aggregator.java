@@ -44,11 +44,11 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
   }
 
   private final ImmutableMap<Criterion, Aggregator> subs;
-  private final Optional<Aggregator> defaultSub;
+  private final Aggregator defaultSub;
 
-  protected Aggregator(Map<Criterion, Aggregator> subs, Optional<Aggregator> defaultSub) {
+  protected Aggregator(Map<Criterion, Aggregator> subs, Aggregator defaultSub) {
     this.subs = ImmutableMap.copyOf(subs);
-    this.defaultSub = checkNotNull(defaultSub);
+    this.defaultSub = defaultSub;
   }
 
   public ImmutableMap<Criterion, Aggregator> subs(Set<Criterion> criteria) {
@@ -58,11 +58,13 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
       if (subs.containsKey(criterion)) {
         subAggregators.put(criterion, subs.get(criterion));
       } else {
-        defaultSub.ifPresent(agg -> subAggregators.put(criterion, agg));
+        if (defaultSub != null) {
+          subAggregators.put(criterion, defaultSub);
+        }
       }
     }
     return subAggregators.build();
-  }
+}
 
   public static class WeightedMarks {
     public static WeightedMarks given(OneLevelMarksTree marks, Map<Criterion, Double> weights) {
@@ -154,8 +156,8 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
   }
 
   public Aggregator defaultSub() {
-    return defaultSub.orElse(Weighter.FULL_EQUAL_WEIGHTER);
-  }
+    return defaultSub != null ? defaultSub : Weighter.FULL_EQUAL_WEIGHTER;
+}
 
   public abstract Aggregator withSubs(Map<Criterion, Aggregator> newSubs);
 

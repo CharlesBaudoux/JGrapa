@@ -17,22 +17,22 @@ public final class Weighter extends Aggregator {
   public static final Weighter FULL_EQUAL_WEIGHTER = given(ImmutableMap.of());
 
   public static Weighter given(Map<Criterion, Double> weights) {
-    return new Weighter(weights, Map.of(), Optional.empty());
+    return new Weighter(weights, Map.of(), null);
   }
 
   public static Weighter given(Map<Criterion, Double> weights, Map<Criterion, Aggregator> subs,
-      Optional<Aggregator> defaultSub) {
+      Aggregator defaultSub) {
     return new Weighter(weights, subs, defaultSub);
   }
 
   private final ImmutableMap<Criterion, Double> weights;
 
   private Weighter(Map<Criterion, Double> weights, Map<Criterion, Aggregator> subs,
-      Optional<Aggregator> defaultSub) {
+      Aggregator defaultSub) {
     super(subs, defaultSub);
     this.weights = ImmutableMap.copyOf(weights);
     weights.values().forEach(w -> checkArgument(w >= 0d, "Weights must be non-negative."));
-  }
+}
 
   @Override
   public WeightedMarks aggregate(OneLevelMarksTree marks) {
@@ -75,7 +75,7 @@ public final class Weighter extends Aggregator {
 
   @Override
   public Weighter withDefaultSub(Aggregator newDefaultSub) {
-    return new Weighter(weights, subs(), Optional.of(newDefaultSub));
+    return new Weighter(weights, subs(), newDefaultSub);
   }
 
   @Override
@@ -84,8 +84,9 @@ public final class Weighter extends Aggregator {
       return false;
     }
     final Weighter t2 = (Weighter) o2;
-    return weights.equals(t2.weights) && subs().equals(t2.subs())
-        && defaultSub().equals(t2.defaultSub());
+    return weights.equals(t2.weights) 
+        && subs().equals(t2.subs())
+        && Objects.equals(defaultSub(), t2.defaultSub()); 
   }
 
   @Override

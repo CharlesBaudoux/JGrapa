@@ -82,7 +82,7 @@ public class WeighterTests {
   }
 
   private static Weighter givenWeighter(Map<Criterion, Double> weights) {
-    return Weighter.given(weights, ImmutableMap.of(), Optional.empty());
+    return Weighter.given(weights, ImmutableMap.of(), null);
   }
 
   private static Criterion c(String name) {

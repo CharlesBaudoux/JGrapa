@@ -36,14 +36,14 @@ public final class Owa extends Aggregator {
 
   private Owa(List<Double> weights, Map<Criterion, Aggregator> subs,
       Aggregator defaultSub) {
-    super(subs, defaultSub == Weighter.FULL_EQUAL_WEIGHTER ? Optional.empty() : Optional.of(defaultSub));
+    super(subs, defaultSub == Weighter.FULL_EQUAL_WEIGHTER ? null : defaultSub);
     this.weights = ImmutableList.copyOf(weights);
     checkArgument(2 <= ImmutableSet.copyOf(this.weights).size(),
         "OWA weights must contain at least two different values.");
     for (Double weight : weights) {
       checkArgument(0d <= weight, "OWA weights must be non-negative.");
     }
-  }
+}
 
   /**
    * @param marks non-empty

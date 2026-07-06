@@ -58,6 +58,6 @@ public class OwaTests {
   }
 
   private static Owa givenOwa(List<Double> weights) {
-    return Owa.given(weights, ImmutableMap.of(), Optional.empty());
+    return Owa.given(weights, ImmutableMap.of(), null);
   }
 }

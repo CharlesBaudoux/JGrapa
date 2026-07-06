@@ -6,14 +6,13 @@ import static com.google.common.base.Verify.verify;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.github.oliviercailloux.grading.Criterion;
 import io.github.oliviercailloux.grading.assessment.Mark;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+
 
 /**
  * A parametric aggregator that multiplies one criterion by a weighting criterion and optionally
@@ -25,16 +24,16 @@ public final class Parametric extends Aggregator {
   private final Criterion weighting;
 
   public static Parametric given(Criterion multiplied, Criterion weighting) {
-    return new Parametric(multiplied, weighting, Map.of(), Optional.empty());
+    return new Parametric(multiplied, weighting, Map.of(), null);
   }
 
   public static Parametric given(Criterion multiplied, Criterion weighting,
-      Map<Criterion, Aggregator> subs, Optional<Aggregator> defaultSub) {
+      Map<Criterion, Aggregator> subs, Aggregator defaultSub) {
     return new Parametric(multiplied, weighting, subs, defaultSub);
   }
 
   private Parametric(Criterion multiplied, Criterion weighting, Map<Criterion, Aggregator> subs,
-      Optional<Aggregator> defaultSub) {
+      Aggregator defaultSub) {
     super(subs, defaultSub);
     this.multiplied = checkNotNull(multiplied);
     this.weighting = checkNotNull(weighting);
@@ -86,7 +85,7 @@ public final class Parametric extends Aggregator {
 
   @Override
   public Parametric withDefaultSub(Aggregator newDefaultSub) {
-    return new Parametric(multiplied, weighting, subs(), Optional.of(newDefaultSub));
+    return new Parametric(multiplied, weighting, subs(), newDefaultSub);
   }
 
   @Override
