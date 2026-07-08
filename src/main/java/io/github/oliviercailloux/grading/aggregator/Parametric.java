@@ -94,8 +94,10 @@ public final class Parametric extends Aggregator {
       return false;
     }
     final Parametric t2 = (Parametric) o2;
-    return multiplied.equals(t2.multiplied) && weighting.equals(t2.weighting)
-        && subs().equals(t2.subs()) && defaultSub().equals(t2.defaultSub());
+    return multiplied.equals(t2.multiplied) 
+        && weighting.equals(t2.weighting)
+        && subs().equals(t2.subs()) 
+        && Objects.equals(defaultSub(), t2.defaultSub());
   }
 
   @Override

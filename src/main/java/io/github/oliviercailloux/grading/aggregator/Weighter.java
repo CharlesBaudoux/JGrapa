@@ -10,7 +10,7 @@ import io.github.oliviercailloux.grading.Criterion;
 import io.github.oliviercailloux.grading.assessment.Mark;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+
 
 public final class Weighter extends Aggregator {
   /**The aggregator with equal weights for all criteria and with a default sub-aggregator that is itself. */

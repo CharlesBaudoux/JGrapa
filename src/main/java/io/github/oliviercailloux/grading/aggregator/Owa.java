@@ -19,7 +19,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public final class Owa extends Aggregator {
 
@@ -135,8 +134,9 @@ public final class Owa extends Aggregator {
       return false;
     }
     final Owa t2 = (Owa) o2;
-    return weights.equals(t2.weights) && subs().equals(t2.subs())
-        && defaultSub().equals(t2.defaultSub());
+    return weights.equals(t2.weights) 
+        && subs().equals(t2.subs()) 
+        && Objects.equals(defaultSub(), t2.defaultSub());
   }
 
   @Override
