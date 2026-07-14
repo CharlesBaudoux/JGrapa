@@ -42,7 +42,7 @@ public final class Owa extends Aggregator {
     for (Double weight : weights) {
       checkArgument(0d <= weight, "OWA weights must be non-negative.");
     }
-}
+  }
 
   /**
    * @param marks non-empty

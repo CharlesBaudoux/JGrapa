@@ -44,11 +44,11 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
   }
 
   private final ImmutableMap<Criterion, Aggregator> subs;
-  private final Aggregator defaultSub;
+  private final Optional<Aggregator> defaultSub;
 
   protected Aggregator(Map<Criterion, Aggregator> subs, Aggregator defaultSub) {
     this.subs = ImmutableMap.copyOf(subs);
-    this.defaultSub = defaultSub;
+    this.defaultSub = Optional.ofNullable(defaultSub);
   }
 
   public ImmutableMap<Criterion, Aggregator> subs(Set<Criterion> criteria) {
@@ -58,9 +58,7 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
       if (subs.containsKey(criterion)) {
         subAggregators.put(criterion, subs.get(criterion));
       } else {
-        if (defaultSub != null) {
-          subAggregators.put(criterion, defaultSub);
-        }
+        defaultSub.ifPresent(d -> subAggregators.put(criterion, d));
       }
     }
     return subAggregators.build();
@@ -156,7 +154,7 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
   }
 
   public Aggregator defaultSub() {
-    return defaultSub != null ? defaultSub : Weighter.FULL_EQUAL_WEIGHTER;
+    return defaultSub.orElse(Weighter.FULL_EQUAL_WEIGHTER);
 }
 
   public abstract Aggregator withSubs(Map<Criterion, Aggregator> newSubs);
