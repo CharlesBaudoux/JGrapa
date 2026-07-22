@@ -19,23 +19,25 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class Owa extends Aggregator {
 
   private final ImmutableList<Double> weights;
 
   public static Owa given(List<Double> weights) {
-    return new Owa(weights, Map.of(), Weighter.FULL_EQUAL_WEIGHTER);
+    return new Owa(weights, Map.of(), Optional.empty());
   }
 
+  
   public static Owa given(List<Double> weights, Map<Criterion, Aggregator> subs,
       Aggregator defaultSub) {
-    return new Owa(weights, subs, defaultSub);
+    return new Owa(weights, subs, Optional.ofNullable(defaultSub));
   }
 
   private Owa(List<Double> weights, Map<Criterion, Aggregator> subs,
-      Aggregator defaultSub) {
-    super(subs, defaultSub == Weighter.FULL_EQUAL_WEIGHTER ? null : defaultSub);
+      Optional<Aggregator> defaultSub) {
+    super(subs, defaultSub);
     this.weights = ImmutableList.copyOf(weights);
     checkArgument(2 <= ImmutableSet.copyOf(this.weights).size(),
         "OWA weights must contain at least two different values.");
@@ -120,12 +122,12 @@ public final class Owa extends Aggregator {
 
   @Override
   public Owa withSubs(Map<Criterion, Aggregator> newSubs) {
-    return new Owa(weights, newSubs, defaultSub());
+    return new Owa(weights, newSubs, defaultSub);
   }
 
   @Override
   public Owa withDefaultSub(Aggregator newDefaultSub) {
-    return new Owa(weights, subs(), newDefaultSub);
+    return new Owa(weights, subs(), Optional.of(newDefaultSub));
   }
 
   @Override
@@ -134,19 +136,19 @@ public final class Owa extends Aggregator {
       return false;
     }
     final Owa t2 = (Owa) o2;
-    return weights.equals(t2.weights) 
-        && subs().equals(t2.subs()) 
-        && Objects.equals(defaultSub(), t2.defaultSub());
+    return weights.equals(t2.weights)
+        && subs().equals(t2.subs())
+        && defaultSub.equals(t2.defaultSub);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(weights, subs(), defaultSub());
+    return Objects.hash(weights, subs(), defaultSub);
   }
 
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this).add("weights", weights).add("subs", subs())
-        .add("defaultSub", defaultSub()).toString();
+        .add("defaultSub", defaultSub).toString();
   }
 }

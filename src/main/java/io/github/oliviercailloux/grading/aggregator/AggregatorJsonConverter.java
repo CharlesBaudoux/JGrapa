@@ -102,11 +102,8 @@ public class AggregatorJsonConverter {
       }
       node.set("subs", subsNode);
     }
-    
-    Aggregator defaultSub = aggregator.defaultSub();
-    if (defaultSub != null && defaultSub != Weighter.FULL_EQUAL_WEIGHTER) {
-      node.set("defaultSub", toJsonNode(defaultSub));
-    }
+
+    aggregator.defaultSub.ifPresent(d -> node.set("defaultSub", toJsonNode(d)));
   }
 
   private Aggregator fromJsonNode(JsonNode node) {
@@ -123,6 +120,7 @@ public class AggregatorJsonConverter {
         });
 
     ImmutableMap<Criterion, Aggregator> subs = parseSubs(objectNode.get("subs"));
+
     
     Aggregator defaultSub = null;
     if (objectNode.has("defaultSub") && !objectNode.get("defaultSub").isNull()) {

@@ -12,7 +12,7 @@ import io.github.oliviercailloux.grading.Criterion;
 import io.github.oliviercailloux.grading.assessment.Mark;
 import java.util.Map;
 import java.util.Objects;
-
+import java.util.Optional;
 
 /**
  * A parametric aggregator that multiplies one criterion by a weighting criterion and optionally
@@ -24,16 +24,16 @@ public final class Parametric extends Aggregator {
   private final Criterion weighting;
 
   public static Parametric given(Criterion multiplied, Criterion weighting) {
-    return new Parametric(multiplied, weighting, Map.of(), null);
+    return new Parametric(multiplied, weighting, Map.of(), Optional.empty());
   }
 
   public static Parametric given(Criterion multiplied, Criterion weighting,
       Map<Criterion, Aggregator> subs, Aggregator defaultSub) {
-    return new Parametric(multiplied, weighting, subs, defaultSub);
+    return new Parametric(multiplied, weighting, subs, Optional.ofNullable(defaultSub));
   }
 
   private Parametric(Criterion multiplied, Criterion weighting, Map<Criterion, Aggregator> subs,
-      Aggregator defaultSub) {
+      Optional<Aggregator> defaultSub) {
     super(subs, defaultSub);
     this.multiplied = checkNotNull(multiplied);
     this.weighting = checkNotNull(weighting);
@@ -45,7 +45,7 @@ public final class Parametric extends Aggregator {
   public WeightedMarks aggregate(OneLevelMarksTree marks) {
     ImmutableMap<Criterion, Double> effectiveWeights;
     {
-      double weightingMark = marks.optionalMark(weighting).orElse(Mark.max()).value();
+      double weightingMark = marks.optionalMark(weighting).orElseGet(Mark::max).value();
       ImmutableMap.Builder<Criterion, Double> weightsBuilder = ImmutableMap.builder();
       ImmutableSet<Criterion> aPrioriCriteria = ImmutableSet.of(weighting, multiplied);
       ImmutableSet<Criterion> otherCriteria =
@@ -80,12 +80,12 @@ public final class Parametric extends Aggregator {
 
   @Override
   public Parametric withSubs(Map<Criterion, Aggregator> newSubs) {
-    return new Parametric(multiplied, weighting, newSubs, defaultSub());
+    return new Parametric(multiplied, weighting, newSubs, defaultSub);
   }
 
   @Override
   public Parametric withDefaultSub(Aggregator newDefaultSub) {
-    return new Parametric(multiplied, weighting, subs(), newDefaultSub);
+    return new Parametric(multiplied, weighting, subs(), Optional.of(newDefaultSub));
   }
 
   @Override
@@ -94,20 +94,20 @@ public final class Parametric extends Aggregator {
       return false;
     }
     final Parametric t2 = (Parametric) o2;
-    return multiplied.equals(t2.multiplied) 
+    return multiplied.equals(t2.multiplied)
         && weighting.equals(t2.weighting)
-        && subs().equals(t2.subs()) 
-        && Objects.equals(defaultSub(), t2.defaultSub());
+        && subs().equals(t2.subs())
+        && defaultSub.equals(t2.defaultSub);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(multiplied, weighting, subs(), defaultSub());
+    return Objects.hash(multiplied, weighting, subs(), defaultSub);
   }
 
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this).add("multiplied", multiplied)
-        .add("weighting", weighting).add("subs", subs()).add("defaultSub", defaultSub()).toString();
+        .add("weighting", weighting).add("subs", subs()).add("defaultSub", defaultSub).toString();
   }
 }

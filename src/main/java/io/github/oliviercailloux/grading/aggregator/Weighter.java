@@ -7,32 +7,35 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.github.oliviercailloux.grading.Criterion;
-import io.github.oliviercailloux.grading.assessment.Mark;
 import java.util.Map;
 import java.util.Objects;
-
+import java.util.Optional;
 
 public final class Weighter extends Aggregator {
-  /**The aggregator with equal weights for all criteria and with a default sub-aggregator that is itself. */
+  /**
+   * The aggregator with equal weights for all criteria and with no explicit default sub-aggregator,
+   * hence the one whose {@link #defaultSub()} is itself.
+   */
   public static final Weighter FULL_EQUAL_WEIGHTER = given(ImmutableMap.of());
 
   public static Weighter given(Map<Criterion, Double> weights) {
-    return new Weighter(weights, Map.of(), null);
+    return new Weighter(weights, Map.of(), Optional.empty());
   }
 
+  
   public static Weighter given(Map<Criterion, Double> weights, Map<Criterion, Aggregator> subs,
       Aggregator defaultSub) {
-    return new Weighter(weights, subs, defaultSub);
+    return new Weighter(weights, subs, Optional.ofNullable(defaultSub));
   }
 
   private final ImmutableMap<Criterion, Double> weights;
 
   private Weighter(Map<Criterion, Double> weights, Map<Criterion, Aggregator> subs,
-      Aggregator defaultSub) {
+      Optional<Aggregator> defaultSub) {
     super(subs, defaultSub);
     this.weights = ImmutableMap.copyOf(weights);
     weights.values().forEach(w -> checkArgument(w >= 0d, "Weights must be non-negative."));
-}
+  }
 
   @Override
   public WeightedMarks aggregate(OneLevelMarksTree marks) {
@@ -70,12 +73,12 @@ public final class Weighter extends Aggregator {
 
   @Override
   public Weighter withSubs(Map<Criterion, Aggregator> newSubs) {
-    return new Weighter(weights, newSubs, defaultSub());
+    return new Weighter(weights, newSubs, defaultSub);
   }
 
   @Override
   public Weighter withDefaultSub(Aggregator newDefaultSub) {
-    return new Weighter(weights, subs(), newDefaultSub);
+    return new Weighter(weights, subs(), Optional.of(newDefaultSub));
   }
 
   @Override
@@ -84,19 +87,19 @@ public final class Weighter extends Aggregator {
       return false;
     }
     final Weighter t2 = (Weighter) o2;
-    return weights.equals(t2.weights) 
+    return weights.equals(t2.weights)
         && subs().equals(t2.subs())
-        && Objects.equals(defaultSub(), t2.defaultSub()); 
+        && defaultSub.equals(t2.defaultSub);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(weights, subs(), defaultSub());
+    return Objects.hash(weights, subs(), defaultSub);
   }
 
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this).add("weights", weights).add("subs", subs())
-        .add("defaultSub", defaultSub()).toString();
+        .add("defaultSub", defaultSub).toString();
   }
 }
