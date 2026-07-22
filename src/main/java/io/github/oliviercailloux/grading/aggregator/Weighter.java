@@ -22,7 +22,6 @@ public final class Weighter extends Aggregator {
     return new Weighter(weights, Map.of(), Optional.empty());
   }
 
-  
   public static Weighter given(Map<Criterion, Double> weights, Map<Criterion, Aggregator> subs,
       Aggregator defaultSub) {
     return new Weighter(weights, subs, Optional.ofNullable(defaultSub));

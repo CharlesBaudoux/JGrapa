@@ -102,7 +102,6 @@ public class AggregatorJsonConverter {
       }
       node.set("subs", subsNode);
     }
-
     aggregator.defaultSub.ifPresent(d -> node.set("defaultSub", toJsonNode(d)));
   }
 
@@ -120,8 +119,6 @@ public class AggregatorJsonConverter {
         });
 
     ImmutableMap<Criterion, Aggregator> subs = parseSubs(objectNode.get("subs"));
-
-    
     Aggregator defaultSub = null;
     if (objectNode.has("defaultSub") && !objectNode.get("defaultSub").isNull()) {
       defaultSub = fromJsonNode(objectNode.get("defaultSub"));

@@ -29,7 +29,6 @@ public final class Owa extends Aggregator {
     return new Owa(weights, Map.of(), Optional.empty());
   }
 
-  
   public static Owa given(List<Double> weights, Map<Criterion, Aggregator> subs,
       Aggregator defaultSub) {
     return new Owa(weights, subs, Optional.ofNullable(defaultSub));

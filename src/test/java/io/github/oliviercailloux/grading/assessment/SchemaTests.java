@@ -25,7 +25,7 @@ public class SchemaTests {
 
   @BeforeAll
   static void setLocale() {
-      Locale.setDefault(Locale.ENGLISH); 
+    Locale.setDefault(Locale.ENGLISH);
   }
 
   @SuppressWarnings("unused")

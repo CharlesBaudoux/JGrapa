@@ -44,7 +44,6 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
   }
 
   private final ImmutableMap<Criterion, Aggregator> subs;
-  
   final Optional<Aggregator> defaultSub;
 
   protected Aggregator(Map<Criterion, Aggregator> subs, Optional<Aggregator> defaultSub) {
@@ -154,13 +153,11 @@ public sealed abstract class Aggregator permits Parametric, Weighter, Owa {
     return subs;
   }
 
-
   public Aggregator defaultSub() {
     return defaultSub.orElse(Weighter.FULL_EQUAL_WEIGHTER);
   }
 
   public abstract Aggregator withSubs(Map<Criterion, Aggregator> newSubs);
 
- 
   public abstract Aggregator withDefaultSub(Aggregator newDefaultSub);
 }
